@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 from sklearn.ensemble import IsolationForest
+from sklearn.model_selection import train_test_split
 import joblib
 
 # Paths
@@ -27,21 +28,27 @@ def train_model():
         return
 
     X = df[features]
-    print(f"Dataset shape for Anomaly Detection: {X.shape}")
+    
+    # Split the data into Training and Testing sets
+    X_train, X_test = train_test_split(X, test_size=0.2, random_state=42)
+    
+    print(f"Training dataset shape: {X_train.shape}")
+    print(f"Testing dataset shape: {X_test.shape}")
 
-    print("Training Isolation Forest...")
+    print("Training Isolation Forest on Training Data...")
     # Contamination defines the expected proportion of outliers.
     # In our generator, we had 3 anomaly days per machine out of 90, meaning roughly ~3% of days are anomalous.
     model = IsolationForest(n_estimators=100, contamination=0.03, random_state=42)
     
-    model.fit(X)
+    model.fit(X_train)
 
+    print("Predicting anomalies on Unseen Test Data...")
     # Predict anomalies (-1 for anomalies, 1 for normal)
-    predictions = model.predict(X)
+    predictions = model.predict(X_test)
     
     # Convert predictions to 1 (anomaly) and 0 (normal) for easier interpretation
     anomalies = (predictions == -1).sum()
-    print(f"Detected {anomalies} anomalies out of {len(X)} records ({(anomalies/len(X))*100:.2f}%).")
+    print(f"Detected {anomalies} anomalies out of {len(X_test)} test records ({(anomalies/len(X_test))*100:.2f}%).")
 
     # Save model
     os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
