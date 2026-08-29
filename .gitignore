@@ -1,6 +1,6 @@
 Manufacturing_Intelligence_Platform_PRD_v2_Expanded.pdf
 *.md
-.env*
+.env
 *.mp4
 *.mov
 *.mkv
