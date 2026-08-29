@@ -1,0 +1,2143 @@
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 1
+ Manufacturing Intelligence & Optimization
+ Platform
+ Project PRD v2.0 — Expanded &
+ Implementation-Ready
+ Independent Personal Portfolio Project
+Inspired by publicly documented manufacturing and sustainability challenges
+Important: This is an independent personal project. It is not commissioned, endorsed, operated, or supplied with
+confidential data by Saint-Gobain. All company-specific references are inspiration/context only; prototype data is synthetic or
+publicly licensed.
+Document status: Expanded from the supplied PRD after a component-by-component completeness review.
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 2
+1. Component-by-Component Completeness Audit
+The supplied PRD already contains substantial implementation detail across all five phases. The main gaps were acceptance
+criteria, explicit data contracts, security/observability, ML governance, AI guardrails, calculation assumptions, and clearer
+separation between project targets and measured results. The table below records what was added.
+Component
+Existing detail
+Gap identified
+Added in v2.0
+1.1 Project Setup
+Good
+No explicit environment contract, coding
+standards, CI, secrets policy, health checks.
+Add .env.example, Node/Python version pinning,
+lint/format rules, CI checks, secret handling, local setup
+acceptance criteria.
+1.2 Database Schema
+Good
+Schemas are listed but validation, retention,
+relationships, pagination strategy and
+indexes are not fully specified.
+Add validation rules, timestamps, retention/archival
+approach, compound indexes, referential strategy and
+seed/reset behavior.
+1.3 Data Generator
+Good
+Synthetic data realism and reproducibility
+need stronger rules.
+Add random seed, machine profiles, causal failure
+patterns, missing data, sensor drift, outliers, correlation
+rules and data-quality checks.
+1.4 Basic API
+Good
+Endpoint behavior, response envelopes,
+status codes and error contract are missing.
+Add API conventions, validation, pagination, filtering,
+sorting, error schema and acceptance tests.
+1.5 Data Seeding
+Good
+Idempotency and safe reset behavior are
+not fully defined.
+Add seed modes, duplicate protection, transaction/batch
+strategy, validation report and deterministic seed option.
+2.1 Predictive
+Maintenance
+Good
+Target leakage, time-based labels,
+calibration and business cost of false
+negatives are not fully specified.
+Add label-generation rules, temporal split, calibration,
+PR-AUC, confusion matrix, threshold policy and
+model-card requirements.
+2.2 Energy Anomaly
+Good
+Expected-energy baseline and anomaly
+ground truth need stronger definition.
+Add baseline methodology, anomaly taxonomy, validation
+protocol, false-alert controls and configurable energy
+tariff/emission factors.
+2.3 Quality Prediction
+Partial
+The PRD mixes regression and
+classification and uses recommendations
+without defining causal validity.
+Choose a primary target, define classification/regression
+path, explain recommendation limits and avoid claiming
+parameter changes are guaranteed to improve quality.
+2.4 Model Evaluation
+Partial
+Some metric values are written as if already
+achieved before training.
+Replace pre-filled scores with targets/placeholders;
+require actual experiment results, model versioning and
+reproducible evaluation.
+3.1 Auth
+Good
+Refresh-token storage, password policy,
+audit logs and account lifecycle are not fully
+defined.
+Add secure token strategy, password rules, account
+lock/rate limits, audit events and role-permission matrix.
+3.2 Machine Service
+Good
+Business rules for machine state and OEE
+inputs need explicit definitions.
+Add status derivation rules, OEE formula inputs, data
+freshness, query limits and acceptance criteria.
+3.3 Energy Service
+Good
+Cost and CO2 calculations rely on
+hard-coded assumptions.
+Make tariff, currency, emission factor and source
+configurable; record factor version/source.
+3.4 ML Integration
+Good
+Fallback behavior could hide ML failures;
+observability is limited.
+Add circuit breaker, explicit degraded mode, model
+version in every response, latency metrics and failure
+telemetry.
+3.5 AI Assistant
+Good
+Grounding, tool permissions, prompt
+injection, hallucination controls and citation
+semantics need more detail.
+Add tool-based retrieval, allowlisted queries, data
+provenance, refusal rules, confidence semantics and
+conversation audit trail.
+3.6 WebSocket
+Good
+Authentication, reconnection, event
+ordering and duplicate delivery are not
+specified.
+Add authenticated sockets, reconnect/backoff, event IDs,
+timestamps, idempotency and stale-client handling.
+4.1 Layout
+Good
+Accessibility and role-specific navigation are
+missing.
+Add responsive breakpoints, keyboard accessibility,
+semantic labels and permission-aware navigation.
+4.2 Dashboard
+Good
+KPI definitions and freshness rules need to
+be explicit.
+Add KPI formulas, time windows, data freshness badges,
+empty/error states and drill-down behavior.
+4.3 Machines
+Good
+Machine risk visualization needs calibration
+and explainability guidance.
+Add risk bands, confidence/calibration display, trend
+windows, maintenance workflow and audit history.
+4.4 Energy
+Good
+Savings calculation needs baseline and
+tariff definitions.
+Add baseline period, avoided-cost formula, assumptions
+panel and exportable anomaly evidence.
+4.5 Quality
+Partial
+Parameter recommendations may be
+interpreted as automated control actions.
+Clearly mark recommendations as decision support;
+require human approval and show uncertainty/constraints.
+4.6 AI Chat
+Good
+Sources and confidence are mentioned but
+not defined.
+Add evidence cards, query trace, freshness timestamp,
+unsupported-question handling and safe prompt/context
+boundaries.
+5.1 Integration
+Good
+Contract testing and failure scenarios are
+limited.
+Add end-to-end scenarios, degraded-service tests,
+schema/API contract tests and data-consistency checks.
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 3
+Component
+Existing detail
+Gap identified
+Added in v2.0
+5.2 Testing
+Good
+No explicit coverage goals, test data
+strategy or security tests.
+Add coverage targets, fixture strategy, ML regression
+tests, security tests and load tests.
+5.3 Docker
+Good
+Production hardening is missing.
+Add non-root containers, healthchecks, resource limits,
+pinned images and secret injection.
+5.4 Deployment
+Partial
+Cloud provider assumptions may become
+outdated; no environment separation or
+rollback strategy.
+Define dev/staging/demo environments, health checks,
+logs, rollback and provider-neutral deployment
+requirements.
+5.5 Documentation
+Good
+Model/data documentation and limitations
+are not explicit.
+Add architecture decision records, model cards, dataset
+cards, threat model, runbook and known limitations.
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 4
+PRD v2.0 — Added Cross-Cutting Requirements
+1. Project Positioning and Scope
+This is an independent personal portfolio project inspired by publicly available information about Saint-Gobain and general
+manufacturing challenges.
+It must never be presented as:
+ an official Saint-Gobain system,
+ a commissioned project,
+ a system using Saint-Gobain confidential data,
+ a production deployment inside Saint-Gobain,
+ or a validated solution for Saint-Gobain.
+All plant data used for the prototype must be either synthetic or explicitly licensed public data.
+Every simulated business-impact number must be labelled as a project scenario, target, or estimate—not as an achieved
+Saint-Gobain result.
+2. User Personas
+Plant Engineer
+Needs machine health, predictions, trends, maintenance recommendations, evidence and historical context.
+Maintenance Engineer
+Needs prioritized failure risks, contributing factors, maintenance history and alert acknowledgement.
+Energy/Sustainability Analyst
+Needs energy trends, anomalies, intensity metrics, estimated cost impact and CO2 calculations.
+Production/Quality Engineer
+Needs OEE, production trends, quality risk, defect drivers and decision-support recommendations.
+Administrator
+Needs user management, roles, system configuration, thresholds and audit information.
+Viewer
+Read-only access to approved dashboards and reports.
+3. Functional Requirements
+The system shall:
+1. Ingest or generate timestamped machine/production data.
+2. Store machine metadata and operational readings.
+3. Calculate operational KPIs.
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 5
+4. Generate predictive-maintenance risk scores.
+5. Detect abnormal energy behavior.
+6. Predict quality risk using defined production features.
+7. Create, acknowledge and resolve alerts.
+8. Provide evidence supporting every high-severity prediction.
+9. Expose ML capabilities through documented APIs.
+10. Provide a dashboard with drill-down views.
+11. Provide an AI assistant grounded in application data.
+12. Record model version and prediction timestamp.
+13. Provide authentication and role-based authorization.
+14. Support degraded operation when an ML service is unavailable.
+15. Provide exportable reports/data for demonstration.
+4. Non-Functional Requirements
+Performance
+ Normal dashboard API responses should target <2 seconds for typical queries.
+ ML inference should target <1 second for single-record predictions where practical.
+ Historical queries must use pagination/time windows.
+Availability
+ Each service must expose a health endpoint.
+ The frontend must show degraded/offline state instead of silently displaying stale data.
+Security
+ Never commit secrets.
+ Hash passwords using a modern password hashing algorithm.
+ Validate and sanitize inputs.
+ Apply rate limiting.
+ Restrict CORS.
+ Use secure HTTP headers.
+ Enforce role permissions server-side.
+ Never allow the LLM to execute arbitrary database queries or system commands.
+Maintainability
+ Separate routes/controllers/services/models.
+ Use environment configuration.
+ Use linting and formatting.
+ Maintain API documentation.
+ Use meaningful Git commits.
+5. Data Contract
+Every sensor reading should have:
+ machine_id
+ timestamp
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 6
+ source
+ sensor/operational measurements
+ operating status
+ production count
+ quality indicators where available
+ data quality flags
+Every prediction should have:
+ prediction_id
+ machine_id
+ prediction_type
+ generated_at
+ model_version
+ input_reference or feature snapshot
+ probability/score
+ threshold used
+ risk/severity
+ contributing factors
+ recommendation
+ actual outcome when later verified
+6. Data Quality Rules
+The pipeline should detect:
+ missing timestamps
+ duplicate readings
+ impossible physical values
+ sudden sensor jumps
+ stale sensors
+ missing machine IDs
+ inconsistent units
+ out-of-order events
+Bad data should be flagged rather than silently discarded.
+7. Predictive Maintenance — Label Definition
+For a 48-hour prediction horizon, a positive label should be generated only when a machine failure event occurs within the
+defined future horizon after the observation timestamp.
+Do not use future sensor values as input features.
+Use chronological train/validation/test splits to avoid temporal leakage.
+Because missed failures can be more costly than false alarms, report:
+ Precision
+ Recall
+ F1
+ PR-AUC
+ ROC-AUC
+ Confusion matrix
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 7
+ Calibration
+ False-negative rate
+The decision threshold must be configurable and justified.
+8. Energy Intelligence — Calculation Rules
+Energy cost must be calculated using a configurable tariff rather than a hard-coded universal value.
+CO2 must use a configurable emission factor with:
+ factor value
+ unit
+ source
+ effective date/version
+Example:
+CO2 = energy_kWh × emission_factor_kgCO2_per_kWh
+Energy savings should be described as an estimated opportunity:
+estimated_savings = excess_energy_kWh × applicable_tariff
+The UI must show the assumptions used.
+9. Quality Prediction — Safety Boundary
+Quality predictions are decision-support outputs.
+The system must NOT automatically change industrial control parameters.
+Recommendations should be presented as:
+ suggested action,
+ supporting evidence,
+ expected direction of effect,
+ confidence/uncertainty,
+ constraints,
+ human approval required.
+The prototype should avoid claiming that a model has established causal relationships unless a causal experiment has
+actually been performed.
+10. Model Governance
+For every trained model store:
+ model name
+ version
+ training date
+ dataset version
+ feature list
+ target definition
+ algorithm
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 8
+ evaluation metrics
+ threshold
+ known limitations
+A model card should document:
+ intended use
+ out-of-scope use
+ data assumptions
+ performance
+ failure modes
+ fairness/robustness considerations where applicable.
+11. AI Assistant Guardrails
+The AI assistant should follow this pipeline:
+User question
+→ intent detection
+→ allowlisted application tool
+→ database/analytics retrieval
+→ structured evidence
+→ LLM explanation
+→ response validation
+→ answer + evidence
+The LLM must not:
+ invent plant values,
+ invent machine status,
+ claim a prediction was generated if it was not,
+ execute arbitrary database commands,
+ expose secrets,
+ provide unsupported operational instructions as facts.
+If evidence is insufficient, the assistant should say so.
+Confidence must not be a made-up constant such as 0.95. It should either come from a defined model/grounding mechanism
+or be omitted.
+12. Alert Lifecycle
+Alert states:
+NEW → ACKNOWLEDGED → IN_PROGRESS → RESOLVED
+Optional:
+NEW → DISMISSED
+Each state transition should record:
+ user
+ timestamp
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 9
+ reason/comment where applicable
+Alerts should have:
+ severity
+ source
+ machine
+ prediction/anomaly ID
+ evidence
+ recommended action
+ SLA/priority if implemented
+13. Real-Time Data Strategy
+For the personal prototype, "real-time" should mean simulated streaming or near-real-time updates unless actual industrial
+sensors are available.
+A simulator can publish a new reading every N seconds.
+WebSocket events should contain:
+ event_id
+ event_type
+ timestamp
+ machine_id where applicable
+ payload
+ schema_version
+Clients should reconnect with exponential backoff and tolerate duplicate events.
+14. Observability
+Add:
+ structured application logs
+ request IDs
+ API latency
+ ML inference latency
+ ML service error counts
+ WebSocket connection counts
+ prediction counts
+ anomaly counts
+ alert counts
+A /health endpoint should distinguish:
+ service alive
+ database connected
+ ML service reachable
+ model loaded
+15. Testing Strategy
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 10
+Unit
+Services, validators, calculations, feature engineering and utility functions.
+Integration
+API + MongoDB, API + ML service, authentication, alert lifecycle.
+ML
+Data leakage checks, schema checks, feature consistency, model loading, prediction shape, metric regression.
+End-to-End
+Login → dashboard → machine → prediction → alert → acknowledgement → AI assistant.
+Security
+Authentication bypass, role escalation, invalid JWTs, rate limiting, injection attempts and unsafe AI tool requests.
+Performance
+Large historical queries, concurrent dashboard requests and batch prediction.
+16. Acceptance Criteria
+A phase is complete only when:
+ its implementation works,
+ its tests pass,
+ its documentation exists,
+ its failure cases are handled,
+ its code is committed,
+ and the feature can be demonstrated independently.
+Do not mark a model as successful because it was trained. Mark it successful only after evaluation against a held-out test set.
+17. Demo Scenario
+Create one repeatable 5–10 minute demonstration:
+1. Open plant dashboard.
+2. Show overall KPIs.
+3. Select an at-risk machine.
+4. Show rising temperature/vibration.
+5. Show predictive-maintenance risk.
+6. Open contributing factors.
+7. Show generated maintenance alert.
+8. Open Energy page.
+9. Demonstrate an energy anomaly.
+10. Show estimated savings with assumptions.
+11. Open Quality page.
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 11
+12. Show defect-risk prediction.
+13. Ask AI assistant: "Which machines need attention today?"
+14. Show that the answer is backed by current application data.
+15. Acknowledge an alert.
+16. Show the updated alert state.
+18. Metrics: Targets vs Results
+The existing PRD contains example metrics such as 85% F1 and percentage reductions in downtime, energy cost and
+defects.
+These must NOT be treated as achieved results before the system is actually evaluated.
+Use this structure:
+Target:
+"F1 ≥ 0.80"
+Actual:
+"F1 = [measured after evaluation]"
+Project scenario:
+"If the model prevented X simulated failures, the estimated avoided downtime would be Y."
+This makes the project technically honest and interview-safe.
+19. Recommended MVP Boundary
+If time becomes limited, prioritize:
+MVP
+1. Synthetic data generator
+2. MongoDB
+3. Machine dashboard
+4. Predictive maintenance model
+5. Energy anomaly detection
+6. Alerts
+7. Basic authentication
+8. AI assistant grounded in database data
+V2
+1. Quality prediction
+2. CO2 analytics
+3. WebSocket streaming
+4. Advanced recommendations
+5. Model monitoring
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 12
+6. Docker deployment
+V3
+1. Streaming architecture
+2. Advanced MLOps
+3. Experiment tracking
+4. More sophisticated forecasting
+5. Multi-plant support
+This prevents the project from becoming too large to finish.
+20. Final Project Statement
+Recommended portfolio wording:
+"An independent AI-powered Manufacturing Intelligence & Optimization Platform inspired by publicly documented industrial
+challenges. The platform combines predictive maintenance, energy anomaly detection, quality-risk prediction, operational
+analytics and a grounded AI assistant using synthetic/public datasets."
+Do not describe it as an official Saint-Gobain implementation.
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 13
+2. Supplied PRD — Full Original Content
+The original PRD is preserved below so the expanded document remains traceable to the supplied plan. The requirements
+above should be treated as additions/clarifications to this baseline.
+Manufacturing Intelligence Platform - Project PRD
+Project Overview
+Project Name: Manufacturing Intelligence & Optimization Platform
+Version: 1.0.0
+Type: Personal Portfolio Project
+Inspiration: Saint-Gobain Manufacturing Challenges
+Objective: Build an AI-powered platform for predictive maintenance, energy optimization, and quality prediction in
+manufacturing environments.
+Document Purpose
+This PRD serves as the complete implementation roadmap for building a full-stack manufacturing intelligence platform. It
+provides detailed guidance on what to build at each stage, what features to implement, and establishes a structured
+development workflow with GitHub integration.
+Success Criteria
+ ■ Fully functional predictive maintenance system
+ ■ Energy monitoring with anomaly detection
+ ■ Quality defect prediction
+ ■ AI operations assistant
+ ■ Professional dashboard with real-time data
+ ■ Clean, maintainable code with Git version control
+Development Phases Overview
+Phase
+Duration
+Focus
+Deliverables
+Phase 1
+Week 1-2
+Foundation & Data
+Data generator, Database schemas,
+Basic API
+Phase 2
+Week 3-4
+ML Models
+Three trained ML models,
+Evaluation results
+Phase 3
+Week 5-6
+Backend & API
+Complete REST API, ML integration,
+Auth
+Phase 4
+Week 7-8
+Frontend
+Dashboard, Machine views, AI
+Assistant
+Phase 5
+Week 9-10
+Integration & Polish
+Full system integration, Testing,
+Deployment
+PHASE 1: FOUNDATION & DATA LAYER (Week 1-2)
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 14
+Objective
+Establish the project foundation with data generation capabilities and database schemas. This phase builds the data pipeline
+that will feed all ML models and the dashboard.
+Component 1.1: Project Setup
+What to Build
+Initialize the complete project structure with proper folder organization, virtual environments, and Git repository.
+Implementation Details
+Backend Setup:
+ Create backend directory with:
+- package.json with all dependencies
+- src/ folder structure (models, controllers, routes, services, middleware)
+- .env file for configuration
+- nodemon for development
+ML Services Setup:
+ Create ml-services directory with:
+- Python virtual environment
+- requirements.txt with ML packages
+- src/ folder structure (data_generator, models, api, utils)
+- notebooks/ folder for experimentation
+Frontend Setup:
+ Create frontend directory with:
+- Vite React setup
+- Tailwind CSS configuration
+- src/ folder structure (components, services, hooks, utils)
+- Recharts for visualizations
+Technology Stack
+ Backend: Node.js 20, Express 4, Mongoose
+ ML Services: Python 3.11, Flask 3
+ Frontend: React 18, Vite, Tailwind CSS
+GitHub Commits
+After completion, commit:
+ git init
+git add .
+git commit -m "chore: initialize project structure with backend, frontend, and ml-services"
+git push origin main
+Component 1.2: MongoDB Database Schema Design
+What to Build
+Design and implement MongoDB schemas for all data collections using Mongoose ODM.
+Schema Details
+1. Machines Collection
+ Fields: machineId, name, type, productionLine, installationDate, manufacturer, model, specifications (maxTemp,
+maxVibration, maxPressure, powerRating, expectedLifespan), sensors, maintenanceHistory, currentStatus, createdAt,
+updatedAt
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 15
+ Purpose: Store machine master data including specifications and maintenance history
+ Indexes: machineId (unique), type, productionLine
+2. SensorReadings Collection
+ Fields: machineId, timestamp, readings (temperature, vibration, pressure, current, voltage, powerFactor),
+energyConsumption, operatingStatus, productionCount, qualityMetrics (defectRate, scrapRate), derivedMetrics (OEE,
+availability, performance, quality), metadata
+ Purpose: Store all sensor readings from machines at different timestamps
+ Indexes: compound {machineId: 1, timestamp: -1} for fast queries
+3. Predictions Collection
+ Fields: machineId, timestamp, predictionType (FAILURE_PROBABILITY, ENERGY_ANOMALY, QUALITY_DEFECT),
+modelVersion, result (probability, confidence, timeHorizon, contributingFactors), recommendations, actualOutcome, verifiedAt
+ Purpose: Store all ML predictions for tracking and improvement
+ Indexes: {machineId: 1, timestamp: -1}, {predictionType: 1}
+4. EnergyReadings Collection
+ Fields: machineId, timestamp, consumption, expectedConsumption, deviation, deviationPercentage, isAnomaly,
+anomalyScore, cost, co2Emission, factors (productionVolume, ambientTemperature, operatingHours)
+ Purpose: Track energy usage and anomalies
+ Indexes: {machineId: 1, timestamp: -1}, {isAnomaly: 1}
+5. Users Collection
+ Fields: username, email, passwordHash, role (ADMIN, ENGINEER, OPERATOR, VIEWER), preferences (dashboardLayout,
+notificationSettings), lastLogin, createdAt, updatedAt
+ Purpose: Manage user authentication and preferences
+ Indexes: username (unique), email (unique)
+6. Alerts Collection
+ Fields: machineId, timestamp, type (CRITICAL, WARNING, INFO), message, priority, status (NEW, ACKNOWLEDGED,
+RESOLVED), resolvedAt, assignedTo
+ Purpose: Store system alerts generated from predictions
+ Indexes: {timestamp: -1}, {status: 1}
+Database Configuration
+ // MongoDB Atlas free tier or local MongoDB
+URI: mongodb://localhost:27017/manufacturing_intelligence
+Collections: machines, sensorreadings, predictions, energyreadings, users, alerts
+GitHub Commits
+After completion, commit:
+ git add backend/src/models/
+git commit -m "feat: implement MongoDB schemas for machines, sensors, predictions, energy, users, and alerts"
+git push origin main
+Component 1.3: Data Generation Service
+What to Build
+A Python service that generates realistic synthetic manufacturing data with patterns including normal operation, gradual
+degradation, sudden failures, and anomalies.
+Data Generation Features
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 16
+Machine Configuration:
+ 20-50 machines with different types (CNC_MILLING, CNC_LATHE, FURNACE, CONVEYOR, PRESS, GRINDER)
+ Each machine has unique baseline values for temperature, vibration, pressure, current
+ Machine-specific failure thresholds
+Data Patterns:
+ Normal operation with random noise
+ Time of day patterns (work hours = higher values)
+ Day of week patterns (weekend = reduced activity)
+ Gradual degradation over time (bearing wear simulation)
+ Sudden failure events
+ Intermittent issues
+ Energy anomalies (30-80% spikes)
+ Quality degradation over time
+Data Output:
+ CSV file with 50,000+ rows
+ Columns: machine_id, timestamp, temperature, vibration, pressure, current, voltage, energy_kwh, production_count,
+quality_score, operating_status, failure_risk, is_weekend, hour
+ Derived features: rolling means, rate of change, energy efficiency
+Implementation Details
+ # Key functions to implement
+- generate_sensor_data(): Main generator
+- _generate_machine_baselines(): Setup machine profiles
+- _generate_machine_data(): Generate data per machine
+- _add_derived_features(): Add calculated features
+- save_data(): Export to CSV
+Data Volume
+ Machines: 30
+ Time Period: 90 days
+ Readings: Every 2 hours (8AM-8PM)
+ Total Rows: ~54,000 rows
+ File Size: ~10-15 MB
+GitHub Commits
+After completion, commit:
+ git add ml-services/src/data_generator/
+git commit -m "feat: implement synthetic data generator with realistic manufacturing patterns"
+git push origin main
+Component 1.4: Basic API Endpoints
+What to Build
+Initial API endpoints for machine management and sensor data retrieval. This establishes the backend foundation.
+Endpoints to Implement
+Machine Endpoints:
+ GET    /api/machines           - Get all machines (paginated)
+GET    /api/machines/:id       - Get single machine
+POST   /api/machines           - Add new machine (admin only)
+PUT    /api/machines/:id       - Update machine
+DELETE /api/machines/:id       - Delete machine (admin only)
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 17
+Sensor Data Endpoints:
+ GET    /api/sensors/latest     - Get latest readings for all machines
+GET    /api/sensors/:machineId - Get sensor history for a machine
+GET    /api/sensors/:machineId/latest - Get latest reading
+Health Check:
+ GET    /api/health             - System health status
+Implementation Details
+ Use Express Router for organization
+ Implement validation middleware
+ Add error handling middleware
+ Include pagination for list endpoints
+ Add request logging
+GitHub Commits
+After completion, commit:
+ git add backend/src/routes/ backend/src/controllers/
+git commit -m "feat: implement basic API endpoints for machines and sensor data"
+git push origin main
+Component 1.5: Data Seeding Script
+What to Build
+A script that populates the database with initial data (machines and sensor readings) using the generated synthetic data.
+Implementation Details
+ // seeding script tasks:
+1. Connect to MongoDB
+2. Read generated CSV data
+3. Transform CSV to MongoDB documents
+4. Insert machines (unique, with upsert)
+5. Insert sensor readings in batches (1000 at a time)
+6. Generate initial predictions (using basic rules)
+7. Log progress and completion
+Running the Seed
+ npm run seed  # Runs node src/scripts/seedDatabase.js
+GitHub Commits
+After completion, commit:
+ git add backend/src/scripts/
+git commit -m "feat: add database seeding script for initial data population"
+git push origin main
+Phase 1 Completion Checklist
+ [ ] Project structure created
+ [ ] All dependencies installed
+ [ ] MongoDB schemas implemented
+ [ ] Data generator working and generating CSV
+ [ ] Basic API endpoints tested
+ [ ] Database seeded with initial data
+ [ ] All code pushed to GitHub
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 18
+Phase 1 Deliverables
+1. ■ Complete project structure
+2. ■ 6 MongoDB collections with schemas
+3. ■ Data generator with realistic patterns
+4. ■ 7+ working API endpoints
+5. ■ Seeded database with 30 machines and 54,000+ readings
+6. ■ GitHub repository with clean commit history
+PHASE 2: MACHINE LEARNING MODELS (Week 3-4)
+Objective
+Develop, train, and evaluate three ML models: Predictive Maintenance, Energy Anomaly Detection, and Quality Defect
+Prediction. Use Google Colab for GPU-accelerated training.
+Component 2.1: Predictive Maintenance Model (Classification)
+What to Build
+A machine learning model that predicts the probability of machine failure within the next 48 hours.
+Business Problem
+Unplanned machine downtime costs manufacturing companies millions annually. Early detection of failure patterns allows
+preventive maintenance scheduling, reducing downtime by 30-40%.
+Data Requirements
+ Features: temperature, vibration, pressure, current, energy_kwh, production_count, operating_hours
+ Engineered Features: rolling means (6 readings), rate of change, temperature-vibration interaction
+ Target: failure_risk (0 = safe, 1 = failure imminent)
+ Data Size: ~50,000 rows
+Technical Approach
+Model Selection:
+1. Random Forest Classifier (baseline, interpretable)
+2. XGBoost Classifier (advanced, better performance)
+3. Compare both, choose best
+Feature Engineering:
+ Create these features:
+- temp_rolling_mean (last 6 readings)
+- vib_rolling_mean (last 6 readings)
+- temp_rate (rate of temperature change)
+- vib_rate (rate of vibration change)
+- temp_vib_interaction (temperature × vibration)
+- energy_efficiency (production / energy)
+- hour_of_day (categorical)
+- is_weekend (boolean)
+- days_since_maintenance (from maintenance history)
+Handling Imbalance:
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 19
+ Class imbalance expected (few failures)
+ Use class_weight='balanced'
+ Experiment with SMOTE
+ Lower threshold for failure prediction
+Hyperparameter Tuning:
+ Random Forest:
+- n_estimators: 100, 200, 300
+- max_depth: 10, 15, 20
+- min_samples_split: 2, 5, 10
+- class_weight: balanced, balanced_subsample
+XGBoost:
+- learning_rate: 0.01, 0.1, 0.3
+- max_depth: 3, 6, 10
+- n_estimators: 100, 500, 1000
+- subsample: 0.7, 0.8, 1.0
+Evaluation Metrics
+ Primary: F1-Score (balance of precision and recall)
+ Secondary: Precision, Recall, AUC-ROC
+ Threshold: Optimize for F1-Score
+Expected Output
+ Example Prediction:
+{
+  "probability": 82.4,
+  "risk_level": "HIGH",
+  "time_horizon": "48h",
+  "confidence": 0.94,
+  "contributing_factors": [
+    {"factor": "temperature_trend", "contribution": 0.45},
+    {"factor": "vibration_spikes", "contribution": 0.32},
+    {"factor": "operating_hours", "contribution": 0.23}
+  ],
+  "recommendations": [
+    "Schedule immediate inspection of bearings",
+    "Reduce production load by 15% until inspection"
+  ]
+}
+Model Training in Colab
+ # Training Steps:
+1. Load synthetic_data.csv
+2. Create features and target
+3. Split data (70% train, 15% val, 15% test) - maintain temporal order
+4. Scale features (StandardScaler)
+5. Train Random Forest
+6. Train XGBoost
+7. Compare performance
+8. Save best model (joblib.dump)
+9. Upload model to Google Drive
+GitHub Commits
+After completion, commit:
+ git add ml-services/src/models/predictive_maintenance.py
+git add ml-services/notebooks/01_predictive_maintenance.ipynb
+git commit -m "feat: implement predictive maintenance model with 82% F1-score"
+git push origin main
+Component 2.2: Energy Anomaly Detection Model (Unsupervised)
+What to Build
+An unsupervised anomaly detection model that identifies machines consuming significantly more energy than expected.
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 20
+Business Problem
+Energy costs represent 15-20% of manufacturing operating costs. Detecting energy anomalies early can save 10-15% on
+energy bills and identify equipment inefficiencies.
+Data Requirements
+ Features: energy_kwh, production_count, hour_of_day, day_of_week, ambient_temperature
+ No labels needed (unsupervised)
+ Data Size: ~50,000 rows
+Technical Approach
+Model Selection:
+1. Isolation Forest (primary - fast, good for outliers)
+2. Autoencoder (secondary - learns normal patterns)
+3. Statistical methods (baseline)
+Feature Engineering:
+ Create these features:
+- expected_energy (based on production and time)
+- energy_deviation (actual - expected)
+- hour_energy_pattern (average energy at this hour)
+- production_energy_ratio (energy per unit produced)
+Training Process:
+1. Train on "normal" data only (filter out known anomalies)
+2. Set contamination rate (e.g., 0.05 for 5% anomalies)
+3. Detect anomalies on unseen data
+4. Validate with known anomalies in dataset
+Evaluation Metrics
+ Precision: % of detected anomalies that are real
+ Recall: % of real anomalies detected
+ F1-Score: Balance metric
+Expected Output
+ Example Detection:
+{
+  "is_anomaly": true,
+  "anomaly_score": 0.78,
+  "current_consumption": 32.5,
+  "expected_consumption": 26.8,
+  "deviation_percentage": 21.3,
+  "severity": "HIGH",
+  "recommendation": "Inspect machine for bearing wear or inefficiency",
+  "estimated_savings": 2400
+}
+Model Training in Colab
+ # Training Steps:
+1. Load energy data
+2. Create features
+3. Split data (train on normal data only)
+4. Train Isolation Forest
+5. Validate on data with known anomalies
+6. Tune contamination parameter
+7. Save model
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 21
+GitHub Commits
+After completion, commit:
+ git add ml-services/src/models/energy_anomaly.py
+git add ml-services/notebooks/02_energy_anomaly.ipynb
+git commit -m "feat: implement energy anomaly detection model with 78% F1-score"
+git push origin main
+Component 2.3: Quality Defect Prediction Model (Regression/Classification)
+What to Build
+A model that predicts the probability of quality defects based on production parameters, enabling proactive quality control.
+Business Problem
+Quality defects can cost 10-15% of revenue in manufacturing. Predicting defects before they occur allows parameter
+adjustments to maintain quality.
+Data Requirements
+ Features: temperature, pressure, current, production_speed, raw_material_quality (simulated), operator_experience
+(simulated), hour_of_day
+ Target: quality_score (0-100) or defect_probability
+ Data Size: ~50,000 rows
+Technical Approach
+Model Selection:
+1. XGBoost Regressor (primary - best performance)
+2. Random Forest Regressor (secondary - interpretable)
+3. Neural Network (optional - if time permits)
+Feature Engineering:
+ Create these features:
+- temp_pressure_ratio (temperature / pressure)
+- production_speed_parameter (speed × load)
+- parameter_instability (variance of recent parameters)
+- raw_material_temperature (simulated)
+- operator_shift (morning/evening/night)
+Training Process:
+1. Define target: defect_probability (derived from quality_score)
+2. Split data
+3. Train models
+4. Evaluate performance
+5. Choose best model
+Evaluation Metrics
+ Regression: RMSE, MAE, R²
+ Classification: Precision, Recall, F1-Score
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 22
+Expected Output
+ Example Prediction:
+{
+  "defect_probability": 76.3,
+  "risk_level": "HIGH",
+  "quality_score": 72,
+  "contributing_factors": [
+    {"factor": "pressure_deviation", "contribution": 0.38},
+    {"factor": "temperature_variation", "contribution": 0.31},
+    {"factor": "raw_material_quality", "contribution": 0.21}
+  ],
+  "recommendations": [
+    "Reduce pressure to 8.5 bar (±0.2)",
+    "Stabilize temperature at 65°C",
+    "Switch to higher quality raw material batch"
+  ]
+}
+Model Training in Colab
+ # Training Steps:
+1. Load quality data
+2. Create features
+3. Define target (defect probability)
+4. Split data
+5. Train XGBoost Regressor
+6. Evaluate on test set
+7. Save model
+GitHub Commits
+After completion, commit:
+ git add ml-services/src/models/quality_defect.py
+git add ml-services/notebooks/03_quality_defect.ipynb
+git commit -m "feat: implement quality defect prediction model with 0.85 R²"
+git push origin main
+Component 2.4: Model Evaluation & Selection
+What to Build
+Comprehensive evaluation comparing all models to select the best performers for deployment.
+Evaluation Criteria
+Predictive Maintenance:
+Model
+F1-Score
+Precision
+Recall
+AUC-ROC
+Random Forest
+0.82
+0.79
+0.85
+0.91
+XGBoost
+0.85
+0.83
+0.87
+0.93
+Winner: XGBoost
+Energy Anomaly:
+Model
+Precision
+Recall
+F1-Score
+Isolation Forest
+0.72
+0.68
+0.70
+Autoencoder
+0.75
+0.71
+0.73
+Winner: Autoencoder
+Quality Defect:
+Model
+RMSE
+MAE
+R²
+XGBoost
+4.2
+3.1
+0.85
+Random Forest
+5.1
+3.8
+0.78
+Winner: XGBoost
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 23
+Model Artifacts
+ models/
+■■■ failure_model_xgboost.pkl    (Predictive Maintenance)
+■■■ energy_anomaly_autoencoder.h5 (Energy Anomaly)
+■■■ quality_model_xgboost.pkl    (Quality Defect)
+■■■ scaler.pkl                   (Feature scaler for all models)
+■■■ feature_names.pkl            (List of features used)
+■■■ model_metadata.json          (Version, performance, requirements)
+GitHub Commits
+After completion, commit:
+ git add ml-services/models/
+git add ml-services/notebooks/04_model_evaluation.ipynb
+git commit -m "feat: finalize model selection with XGBoost for main models, save artifacts"
+git push origin main
+Phase 2 Completion Checklist
+ [ ] Predictive maintenance model trained and evaluated
+ [ ] Energy anomaly model trained and evaluated
+ [ ] Quality defect model trained and evaluated
+ [ ] Model comparison completed
+ [ ] Best models saved and downloaded to local
+ [ ] Model artifacts documented
+ [ ] All notebooks saved to GitHub
+Phase 2 Deliverables
+1. ■ 3 trained ML models with >80% accuracy
+2. ■ Jupyter notebooks with complete training pipeline
+3. ■ Model evaluation results
+4. ■ Saved model artifacts ready for deployment
+5. ■ GitHub commits with training code
+PHASE 3: BACKEND & API COMPLETE (Week 5-6)
+Objective
+Build a complete REST API with authentication, ML model integration, all business logic, and real-time capabilities.
+Component 3.1: Authentication & Authorization
+What to Build
+JWT-based authentication system with role-based access control for different user types.
+Features
+User Registration:
+ POST /api/auth/register
+ Fields: username, email, password, role
+ Password hashing with bcrypt
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 24
+ Email validation
+ Username uniqueness check
+User Login:
+ POST /api/auth/login
+ Returns JWT token with user info
+ Token expires in 7 days
+ Refresh token mechanism
+Authentication Middleware:
+ Verify JWT on protected routes
+ Extract user from token
+ Add user to request object
+Authorization:
+ Role-based access (ADMIN, ENGINEER, OPERATOR, VIEWER)
+ Middleware: requireRole(['ADMIN', 'ENGINEER'])
+ Different permissions for different roles
+Protected Routes:
+ Admin: Manage machines, users, system config
+ Engineer: View predictions, generate reports
+ Operator: View dashboard, acknowledge alerts
+ Viewer: Read-only access
+Implementation Details
+ // authMiddleware.js
+const verifyToken = (req, res, next) => {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) return res.status(401).json({ error: 'Access denied' });
+    try {
+        const verified = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = verified;
+        next();
+    } catch (error) {
+        res.status(401).json({ error: 'Invalid token' });
+    }
+};
+const requireRole = (...roles) => {
+    return (req, res, next) => {
+        if (!roles.includes(req.user.role)) {
+            return res.status(403).json({ error: 'Insufficient permissions' });
+        }
+        next();
+    };
+};
+API Security
+ Rate limiting (100 requests per minute)
+ Helmet.js for security headers
+ CORS configuration
+ Input validation with express-validator
+ SQL injection prevention (MongoDB sanitization)
+GitHub Commits
+After completion, commit:
+ git add backend/src/middleware/auth.js
+git add backend/src/controllers/authController.js
+git add backend/src/routes/authRoutes.js
+git commit -m "feat: implement JWT authentication with role-based authorization"
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 25
+git push origin main
+Component 3.2: Machine Service & API
+What to Build
+Complete CRUD operations for machines with additional intelligence features.
+Endpoints
+Machine Management:
+ GET    /api/machines               - List all machines (paginated, filterable)
+GET    /api/machines/:id           - Get machine details
+POST   /api/machines               - Create machine (admin only)
+PUT    /api/machines/:id           - Update machine (admin only)
+DELETE /api/machines/:id           - Delete machine (admin only)
+Machine Status:
+ GET    /api/machines/:id/status    - Get current status (RUNNING/IDLE/AT_RISK)
+GET    /api/machines/:id/sensors   - Get latest sensor readings
+GET    /api/machines/at-risk       - Get all at-risk machines
+Machine Predictions:
+ GET    /api/machines/:id/predictions - Get ML predictions for machine
+GET    /api/machines/:id/predictions/latest - Get latest prediction
+GET    /api/machines/:id/maintenance - Get maintenance recommendations
+Machine History:
+ GET    /api/machines/:id/history   - Get operational history
+GET    /api/machines/:id/performance - Get performance metrics (OEE, etc.)
+Implementation Details
+ // machineService.js
+class MachineService {
+    async getMachineWithPredictions(machineId) {
+        // 1. Get machine data
+        // 2. Get latest sensor reading
+        // 3. Call ML service for prediction
+        // 4. Combine and return
+    }
+    
+    async getAtRiskMachines() {
+        // 1. Get all predictions with high risk
+        // 2. Filter by threshold (>70% probability)
+        // 3. Sort by risk level
+        // 4. Return enriched data
+    }
+    
+    async calculateOEE(machineId, timeRange) {
+        // 1. Get availability data
+        // 2. Get performance data
+        // 3. Get quality data
+        // 4. Calculate OEE = Availability × Performance × Quality
+    }
+}
+GitHub Commits
+After completion, commit:
+ git add backend/src/services/machineService.js
+git add backend/src/controllers/machineController.js
+git add backend/src/routes/machineRoutes.js
+git commit -m "feat: implement complete machine service with predictions and OEE"
+git push origin main
+Component 3.3: Energy Service & API
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 26
+What to Build
+Energy monitoring service with anomaly detection and historical analysis.
+Endpoints
+Energy Monitoring:
+ GET    /api/energy/current          - Current energy consumption across plant
+GET    /api/energy/machines         - Energy consumption by machine
+GET    /api/energy/machine/:id      - Energy for specific machine
+GET    /api/energy/historical       - Historical energy trends
+GET    /api/energy/anomalies        - Energy anomalies detected
+Energy Analytics:
+ GET    /api/energy/forecast         - Energy forecast (next 24 hours)
+GET    /api/energy/savings          - Estimated savings opportunities
+GET    /api/energy/co2              - CO2 emissions tracking
+GET    /api/energy/efficiency       - Energy efficiency metrics
+Energy Alerts:
+ GET    /api/energy/alerts           - Energy-related alerts
+POST   /api/energy/alerts/:id/acknowledge - Acknowledge alert
+PUT    /api/energy/thresholds       - Update anomaly thresholds
+Implementation Details
+ // energyService.js
+class EnergyService {
+    async detectAnomalies(machineId, readings) {
+        // 1. Call ML service for anomaly detection
+        // 2. If anomaly detected, create alert
+        // 3. Calculate deviation and impact
+        // 4. Return anomaly report
+    }
+    
+    async calculateSavings() {
+        // 1. Find all anomalies
+        // 2. Calculate excess consumption
+        // 3. Multiply by energy rate
+        // 4. Return total savings opportunity
+    }
+    
+    async trackCO2(energyData) {
+        // 1. Get energy consumption
+        // 2. Apply CO2 conversion factor (0.38 kg/kWh)
+        // 3. Aggregate by time period
+        // 4. Return CO2 report
+    }
+}
+GitHub Commits
+After completion, commit:
+ git add backend/src/services/energyService.js
+git add backend/src/controllers/energyController.js
+git add backend/src/routes/energyRoutes.js
+git commit -m "feat: implement energy monitoring with anomaly detection and CO2 tracking"
+git push origin main
+Component 3.4: ML Service Integration
+What to Build
+A client service that communicates with Python ML services to get predictions.
+Implementation Details
+ML Service Client:
+ // mlServiceClient.js
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 27
+class MLServiceClient {
+    constructor() {
+        this.baseURL = process.env.ML_SERVICE_URL || 'http://localhost:5001';
+        this.timeout = 5000;
+    }
+    
+    async predictFailure(sensorData) {
+        // POST /predict/failure
+        // Input: { temperature, vibration, energy, operating_hours, production_count }
+        // Output: { probability, risk_level, time_horizon, confidence }
+    }
+    
+    async detectEnergyAnomaly(energyData) {
+        // POST /detect/anomaly
+        // Input: { energy_kwh, production_count, hour, day_of_week }
+        // Output: { is_anomaly, anomaly_score, deviation_percentage }
+    }
+    
+    async predictQuality(parameters) {
+        // POST /predict/quality
+        // Input: { temperature, pressure, current, production_speed }
+        // Output: { defect_probability, quality_score, recommendations }
+    }
+}
+ML Service Integration Strategy:
+1. Async Calls: Use axios with async/await
+2. Caching: Cache predictions for 5 minutes to reduce calls
+3. Fallbacks: Return default values if ML service is down
+4. Retry Logic: Retry failed requests up to 3 times
+5. Timeout: Set 5-second timeout for predictions
+6. Batching: Batch predictions when possible
+ML Service API Endpoints
+ POST /predict/failure        - Get failure probability
+POST /detect/anomaly         - Detect energy anomaly
+POST /predict/quality        - Predict quality defect
+GET  /health                - ML service health check
+GET  /models/status         - Model loading status
+GitHub Commits
+After completion, commit:
+ git add backend/src/services/mlServiceClient.js
+git add ml-services/src/api/routes.py
+git commit -m "feat: integrate ML services with Node.js backend, implement prediction endpoints"
+git push origin main
+Component 3.5: AI Assistant Service
+What to Build
+An AI assistant that answers user questions about plant operations using actual database data.
+Features
+Question Answering:
+ POST /api/ai/query
+Input: { question: "Why did energy consumption increase today?" }
+Output: { answer: "...", data: [supporting data], confidence: 0.95 }
+Intelligent Questions:
+ "Which machines require maintenance this week?"
+ "What caused yesterday's production drop?"
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 28
+ "Show me machines with highest energy consumption"
+ "What's the current OEE of the plant?"
+ "Which machine is most likely to fail?"
+Implementation Strategy:
+1. Intent Classification: Determine what user is asking
+2. Data Retrieval: Query MongoDB for relevant data
+3. Context Building: Format data for LLM
+4. Response Generation: Use LLM to generate answer
+5. Validation: Ensure answer is based on actual data
+Technology Options:
+ Option A: OpenAI API (simplest, best quality) - $5-10 for demo
+ Option B: Local LLM (Open Source) - Free, requires more setup
+ Option C: Rule-based responses (no LLM) - Good for specific questions
+Implementation Example:
+ // aiAssistantService.js
+class AIAssistantService {
+    async answerQuestion(question, userContext) {
+        // 1. Classify intent
+        const intent = await this.classifyIntent(question);
+        
+        // 2. Query data based on intent
+        const data = await this.fetchData(intent, question);
+        
+        // 3. Build context
+        const context = this.buildContext(data);
+        
+        // 4. Generate response
+        const answer = await this.generateResponse(question, context);
+        
+        return {
+            answer: answer,
+            data: data,
+            confidence: 0.95
+        };
+    }
+    
+    classifyIntent(question) {
+        // Check for keywords
+        if (question.includes('energy') || question.includes('consumption')) {
+            return 'ENERGY_QUERY';
+        }
+        if (question.includes('failure') || question.includes('maintenance')) {
+            return 'MAINTENANCE_QUERY';
+        }
+        if (question.includes('quality') || question.includes('defect')) {
+            return 'QUALITY_QUERY';
+        }
+        if (question.includes('production') || question.includes('efficiency')) {
+            return 'PRODUCTION_QUERY';
+        }
+        return 'GENERAL_QUERY';
+    }
+}
+GitHub Commits
+After completion, commit:
+ git add backend/src/services/aiAssistantService.js
+git add backend/src/controllers/aiAssistantController.js
+git add backend/src/routes/aiAssistantRoutes.js
+git commit -m "feat: implement AI assistant with intent classification and data retrieval"
+git push origin main
+Component 3.6: WebSocket for Real-Time Updates
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 29
+What to Build
+WebSocket server for pushing real-time updates to the frontend.
+Features
+WebSocket Events:
+ machine_update          - When machine status changes
+prediction_update       - When new prediction generated
+energy_anomaly          - When energy anomaly detected
+alert_created           - When new alert is created
+dashboard_kpi_update    - When KPIs are updated (every 5 minutes)
+Implementation Details:
+ // socket.js
+const initializeSocket = (server) => {
+    const io = new Server(server, {
+        cors: { origin: process.env.FRONTEND_URL }
+    });
+    
+    io.on('connection', (socket) => {
+        console.log('User connected:', socket.id);
+        
+        // Join machine-specific rooms
+        socket.on('subscribe_machine', (machineId) => {
+            socket.join(`machine_${machineId}`);
+        });
+        
+        // Broadcast updates
+        socket.on('disconnect', () => {
+            console.log('User disconnected:', socket.id);
+        });
+    });
+    
+    // Emit updates functions
+    const emitMachineUpdate = (machineData) => {
+        io.emit('machine_update', machineData);
+        io.to(`machine_${machineData.machineId}`).emit('machine_update', machineData);
+    };
+    
+    return { io, emitMachineUpdate };
+};
+GitHub Commits
+After completion, commit:
+ git add backend/src/socket.js
+git commit -m "feat: implement WebSocket server for real-time updates"
+git push origin main
+Phase 3 Completion Checklist
+ [ ] JWT authentication implemented
+ [ ] Role-based authorization working
+ [ ] Machine API complete with predictions
+ [ ] Energy API complete with anomaly detection
+ [ ] AI Assistant service working
+ [ ] WebSocket real-time updates
+ [ ] All API endpoints tested with Postman
+ [ ] API documentation created
+ [ ] All code pushed to GitHub
+Phase 3 Deliverables
+1. ■ Complete REST API with 30+ endpoints
+2. ■ JWT authentication with 4 user roles
+3. ■ ML service integration
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 30
+4. ■ AI assistant with intent classification
+5. ■ WebSocket real-time updates
+6. ■ Full API documentation
+PHASE 4: FRONTEND DEVELOPMENT (Week 7-8)
+Objective
+Build a professional React dashboard with real-time data visualization, machine management, energy monitoring, quality
+tracking, and AI assistant chat interface.
+Component 4.1: Dashboard Layout & Navigation
+What to Build
+Main layout with sidebar navigation and responsive design.
+Features
+Sidebar Navigation:
+ ■ Dashboard
+  ■■■ ■ Plant Health
+  ■■■ ■ Machines
+  ■■■ ■ Energy
+  ■■■ ■ Quality
+  ■■■ ■ AI Assistant
+  ■■■ ■■ Settings
+Top Bar:
+ [Logo] Manufacturing Intelligence Platform    [■ 3] [■ John] [Logout]
+Global Components:
+ Toast notifications
+ Loading spinners
+ Error boundaries
+ Modal dialogs
+ Breadcrumbs
+Implementation Details
+ // Layout.jsx
+const Layout = ({ children }) => {
+    return (
+        <div className="flex h-screen bg-gray-50">
+            <Sidebar />
+            <div className="flex-1 flex flex-col overflow-hidden">
+                <TopBar />
+                <main className="flex-1 overflow-y-auto p-6">
+                    {children}
+                </main>
+            </div>
+        </div>
+    );
+};
+GitHub Commits
+After completion, commit:
+ git add frontend/src/components/common/Layout.jsx
+git add frontend/src/components/common/Sidebar.jsx
+git add frontend/src/components/common/TopBar.jsx
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 31
+git commit -m "feat: implement main layout with sidebar navigation and top bar"
+git push origin main
+Component 4.2: Dashboard Page
+What to Build
+The main dashboard showing plant health overview with KPI cards, machine health grid, and trend charts.
+Features
+KPI Cards (8 metrics):
+1. Overall Equipment Effectiveness (OEE) - 87.5%
+2. Production Efficiency - 92.3%
+3. Energy Consumption - 1,245.6 kWh
+4. Energy Efficiency - 88.2%
+5. Machine Health - 91.4%
+6. Downtime - 4.2 hours
+7. CO2 Emissions - 125.4 tons
+8. Defect Rate - 3.2%
+Machine Health Grid:
+ Color-coded by status (green, yellow, orange, red)
+ Display machine ID and status
+ Click to navigate to machine detail
+Trend Charts:
+ Production vs Energy (line chart)
+ OEE over time (line chart)
+ Defect Rate trend (bar chart)
+Alert Feed:
+ Recent alerts (critical, warning, info)
+ Auto-refresh every 30 seconds
+ Click to acknowledge
+Refresh Mechanism:
+ Auto-refresh every 30 seconds
+ Manual refresh button
+ Pull-to-refresh on mobile
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 32
+Implementation Details
+ // Dashboard.jsx
+const Dashboard = () => {
+    const { kpis, machines, alerts, trends, loading } = useDashboardData();
+    
+    if (loading) return <LoadingSpinner />;
+    
+    return (
+        <div className="space-y-6">
+            <KpiCards data={kpis} />
+            <div className="grid grid-cols-2 gap-6">
+                <MachineHealthGrid machines={machines} />
+                <AlertFeed alerts={alerts} />
+            </div>
+            <div className="grid grid-cols-2 gap-6">
+                <EnergyTrendChart data={trends.energy} />
+                <OEETrendChart data={trends.oee} />
+            </div>
+        </div>
+    );
+};
+Data Fetching
+ // hooks/useDashboardData.js
+const useDashboardData = () => {
+    const [data, setData] = useState({ loading: true });
+    
+    useEffect(() => {
+        fetchDashboardData();
+        const interval = setInterval(fetchDashboardData, 30000);
+        return () => clearInterval(interval);
+    }, []);
+    
+    const fetchDashboardData = async () => {
+        try {
+            const [kpis, machines, alerts, trends] = await Promise.all([
+                api.get('/dashboard/kpis'),
+                api.get('/machines/status'),
+                api.get('/alerts/recent'),
+                api.get('/dashboard/trends')
+            ]);
+            setData({ kpis, machines, alerts, trends, loading: false });
+        } catch (error) {
+            console.error('Error fetching dashboard:', error);
+        }
+    };
+    
+    return data;
+};
+GitHub Commits
+After completion, commit:
+ git add frontend/src/components/dashboard/
+git add frontend/src/hooks/useDashboardData.js
+git commit -m "feat: implement dashboard with KPI cards, machine grid, and trend charts"
+git push origin main
+Component 4.3: Machines Page
+What to Build
+Machine list view and detailed machine page with sensor data and predictions.
+Features
+Machine List View:
+ Table with machine ID, type, status, health score, failure probability
+ Search and filter functionality
+ Sort by any column
+ Pagination
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 33
+Machine Detail Page:
+ Machine Header:
+- Machine ID, name, type, status badge
+- Failure probability indicator
+Sensor Metrics Grid:
+- Temperature (current, min, max, trend)
+- Vibration (current, min, max, trend)
+- Pressure (current, min, max, trend)
+- Energy Consumption (current, expected, deviation)
+Sensor Trends Chart:
+- Multi-line chart (temperature, vibration, pressure)
+- 24-hour view
+- Anomaly markers
+Maintenance History:
+- List of past maintenance events
+- Next scheduled maintenance
+- Recommended maintenance
+Predictions:
+- Current prediction
+- Contributing factors (bar chart)
+- Recommendations (actionable items)
+Implementation Details
+ // MachineDetail.jsx
+const MachineDetail = ({ machineId }) => {
+    const { machine, readings, predictions, history } = useMachineData(machineId);
+    const [timeRange, setTimeRange] = useState('24h');
+    
+    return (
+        <div className="space-y-6">
+            <MachineHeader machine={machine} prediction={predictions.latest} />
+            
+            <div className="grid grid-cols-4 gap-4">
+                <SensorMetric label="Temperature" value={readings.temperature} 
+                              unit="°C" threshold={machine.specs.maxTemp} />
+                <SensorMetric label="Vibration" value={readings.vibration} 
+                              unit="mm/s" threshold={machine.specs.maxVibration} />
+                <SensorMetric label="Pressure" value={readings.pressure} 
+                              unit="bar" threshold={machine.specs.maxPressure} />
+                <SensorMetric label="Energy" value={readings.energy} 
+                              unit="kWh" expected={readings.expectedEnergy} />
+            </div>
+            
+            <SensorTrendsChart data={readings.history} timeRange={timeRange} />
+            
+            <div className="grid grid-cols-2 gap-6">
+                <MaintenanceHistory history={history} />
+                <PredictionsPanel predictions={predictions} />
+            </div>
+        </div>
+    );
+};
+GitHub Commits
+After completion, commit:
+ git add frontend/src/components/machines/
+git commit -m "feat: implement machine list and detail pages with sensor data and predictions"
+git push origin main
+Component 4.4: Energy Page
+What to Build
+Energy monitoring dashboard with consumption tracking and anomaly detection.
+Features
+Energy Overview:
+ Current total consumption
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 34
+ Energy efficiency score
+ Cost today
+ CO2 emissions today
+Consumption by Machine:
+ Bar chart showing consumption per machine
+ Color-coded for anomalies
+ Click to view machine details
+Anomaly List:
+ List of detected anomalies
+ Machine ID, deviation percentage, severity, status
+ Actions: investigate, acknowledge
+Energy Trends:
+ Consumption vs expected (line chart)
+ 24h, 7d, 30d views
+ Anomaly markers
+Potential Savings:
+ Total savings identified
+ Savings by machine
+ Actionable recommendations
+Implementation Details
+ // EnergyDashboard.jsx
+const EnergyDashboard = () => {
+    const { overview, consumption, anomalies, trends, savings } = useEnergyData();
+    
+    return (
+        <div className="space-y-6">
+            <EnergyOverview data={overview} />
+            <div className="grid grid-cols-2 gap-6">
+                <ConsumptionByMachine data={consumption} />
+                <AnomalyList anomalies={anomalies} />
+            </div>
+            <EnergyTrends data={trends} />
+            <SavingsOpportunities savings={savings} />
+        </div>
+    );
+};
+GitHub Commits
+After completion, commit:
+ git add frontend/src/components/energy/
+git commit -m "feat: implement energy dashboard with consumption tracking and anomaly detection"
+git push origin main
+Component 4.5: Quality Page
+What to Build
+Quality monitoring dashboard with defect prediction and parameter optimization.
+Features
+Quality Overview:
+ Current defect rate
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 35
+ Quality score
+ Scrap rate
+ Production volume
+Defect Prediction:
+ Current defect probability
+ Contributing factors (bar chart)
+ Recommended adjustments
+Quality Trends:
+ Defect rate over time (line chart)
+ Quality score over time
+ Scrap rate trend
+Parameter Recommendations:
+ Current vs recommended parameters
+ Adjustment suggestions
+ Expected improvement
+GitHub Commits
+After completion, commit:
+ git add frontend/src/components/quality/
+git commit -m "feat: implement quality page with defect prediction and parameter recommendations"
+git push origin main
+Component 4.6: AI Assistant Chat Interface
+What to Build
+Interactive chat interface where engineers can ask questions about plant operations.
+Features
+Chat Interface:
+ Message list (user messages and AI responses)
+ Input field with send button
+ Quick question buttons
+ Typing indicator
+Sample Questions:
+ "Why did energy consumption increase today?"
+ "Which machines are at risk of failure?"
+ "What's the current OEE?"
+ "Show me machines needing maintenance this week"
+ "What caused yesterday's production drop?"
+Response Display:
+ Natural language answer
+ Supporting data (charts, tables, numbers)
+ Confidence indicator
+ Source citations
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 36
+Implementation Details
+ // ChatInterface.jsx
+const ChatInterface = () => {
+    const [messages, setMessages] = useState([]);
+    const [input, setInput] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const { sendMessage } = useAIAssistant();
+    
+    const handleSend = async () => {
+        const userMessage = { role: 'user', content: input };
+        setMessages([...messages, userMessage]);
+        setInput('');
+        setIsLoading(true);
+        
+        try {
+            const response = await sendMessage(input);
+            const assistantMessage = { 
+                role: 'assistant', 
+                content: response.answer,
+                data: response.data 
+            };
+            setMessages(prev => [...prev, assistantMessage]);
+        } catch (error) {
+            // Handle error
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    
+    return (
+        <div className="h-full flex flex-col">
+            <ChatHeader />
+            <MessageList messages={messages} />
+            {isLoading && <TypingIndicator />}
+            <QuickQuestions onSelect={handleQuickQuestion} />
+            <ChatInput value={input} onChange={setInput} onSend={handleSend} />
+        </div>
+    );
+};
+GitHub Commits
+After completion, commit:
+ git add frontend/src/components/ai-assistant/
+git commit -m "feat: implement AI assistant chat interface with quick questions"
+git push origin main
+Phase 4 Completion Checklist
+ [ ] Dashboard layout with sidebar
+ [ ] KPI cards and machine health grid
+ [ ] Machine list and detail views
+ [ ] Energy monitoring dashboard
+ [ ] Quality tracking page
+ [ ] AI Assistant chat interface
+ [ ] Real-time WebSocket updates
+ [ ] Responsive design
+ [ ] All pages connected to APIs
+Phase 4 Deliverables
+1. ■ Complete React dashboard with 5 main pages
+2. ■ Real-time data updates via WebSocket
+3. ■ Interactive charts and visualizations
+4. ■ AI Assistant with chat interface
+5. ■ Responsive and professional UI
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 37
+PHASE 5: INTEGRATION, TESTING & DEPLOYMENT (Week
+9-10)
+Objective
+Integrate all components, perform comprehensive testing, prepare deployment, and finalize project documentation.
+Component 5.1: Full System Integration
+What to Build
+Complete end-to-end integration of all components: Frontend → Backend → ML Services → Database.
+Integration Tasks
+Backend-Frontend Integration:
+ Connect all API endpoints
+ Handle authentication flow
+ Implement WebSocket connection
+ Error handling and fallbacks
+Backend-ML Integration:
+ ML service connection tests
+ Prediction pipeline verification
+ Error handling for ML failures
+ Caching strategy implementation
+Database Integration:
+ Connection verification
+ Query optimization
+ Index verification
+ Data consistency checks
+Implementation Details
+ // Integration test script
+const testFullFlow = async () => {
+    // 1. Auth test
+    const token = await login('testuser', 'password');
+    
+    // 2. Get dashboard
+    const dashboard = await getDashboard(token);
+    console.log('Dashboard data:', dashboard);
+    
+    // 3. Get machine predictions
+    const machine = await getMachine('M-001', token);
+    console.log('Machine prediction:', machine);
+    
+    // 4. Test AI Assistant
+    const answer = await askQuestion('Why did energy increase?', token);
+    console.log('AI Answer:', answer);
+    
+    // 5. Test WebSocket
+    const ws = connectWebSocket(token);
+    ws.on('machine_update', (data) => {
+        console.log('Real-time update:', data);
+    });
+};
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 38
+GitHub Commits
+After completion, commit:
+ git add integration-tests/
+git commit -m "test: complete end-to-end integration tests for all components"
+git push origin main
+Component 5.2: Testing
+What to Build
+Comprehensive testing suite covering all components.
+Test Types
+Backend Unit Tests:
+ Model validation tests
+ Service layer tests
+ Controller tests
+ Middleware tests
+API Tests:
+ Endpoint response testing
+ Authentication tests
+ Error handling tests
+ Rate limiting tests
+ML Model Tests:
+ Model loading tests
+ Prediction accuracy tests
+ Edge case handling
+ Performance benchmarks
+Frontend Tests:
+ Component rendering tests
+ User interaction tests
+ API integration tests
+ Responsive design tests
+GitHub Commits
+After completion, commit:
+ git add tests/
+git commit -m "test: add comprehensive test suite for all components"
+git push origin main
+Component 5.3: Dockerization
+What to Build
+Docker containers for all services with Docker Compose orchestration.
+Dockerfiles
+Backend Dockerfile:
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 39
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+EXPOSE 3000
+CMD ["npm", "start"]
+ML Services Dockerfile:
+ FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+EXPOSE 5001
+CMD ["python", "src/api/app.py"]
+Frontend Dockerfile:
+ FROM node:20-alpine as build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+Docker Compose:
+ version: '3.8'
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: manufacturing-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+  ml-services:
+    build: ./ml-services
+    container_name: manufacturing-ml
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./ml-services/models:/app/models
+    environment:
+      - FLASK_ENV=production
+  backend:
+    build: ./backend
+    container_name: manufacturing-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/manufacturing_intelligence
+      - ML_SERVICE_URL=http://ml-services:5001
+    depends_on:
+      - mongodb
+      - ml-services
+  frontend:
+    build: ./frontend
+    container_name: manufacturing-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+volumes:
+  mongo_data:
+GitHub Commits
+After completion, commit:
+ git add Dockerfile docker-compose.yml
+git commit -m "deploy: add Docker configuration for all services"
+git push origin main
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 40
+Component 5.4: Deployment
+What to Build
+Deploy the application to a cloud platform for demonstration.
+Deployment Options
+Option A: Railway.app (Recommended)
+ Simple deployment
+ Free tier available
+ Works with Docker
+ Auto-deploy from GitHub
+Option B: Heroku
+ Easy deployment
+ Good documentation
+ Free tier with limitations
+Option C: AWS (Advanced)
+ Full control
+ More complex setup
+ Pay as you go
+Option D: Render.com
+ Similar to Railway
+ Free tier available
+ Docker support
+Deployment Steps
+Railway Deployment:
+1. Connect GitHub repository
+2. Select Docker Compose
+3. Set environment variables
+4. Deploy!
+Environment Variables:
+ NODE_ENV=production
+MONGODB_URI=<your-mongodb-uri>
+JWT_SECRET=<your-secret>
+ML_SERVICE_URL=http://ml-services:5001
+FRONTEND_URL=<your-frontend-url>
+GitHub Commits
+After completion, commit:
+ git add .env.example deploy/
+git commit -m "deploy: prepare for production deployment with environment configuration"
+git push origin main
+Component 5.5: Documentation
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 41
+What to Build
+Complete project documentation for users and developers.
+Documentation Contents
+README.md:
+ Project overview
+ Features list
+ Technology stack
+ Setup instructions
+ Deployment guide
+ Screenshots
+API Documentation:
+ All endpoints
+ Request/response examples
+ Authentication details
+ Error codes
+Architecture Documentation:
+ System architecture diagram
+ Data flow diagram
+ Database schema
+ Component relationships
+User Guide:
+ How to use the dashboard
+ Interpreting predictions
+ Using AI Assistant
+ Managing alerts
+GitHub Commits
+After completion, commit:
+ git add README.md docs/
+git commit -m "docs: add comprehensive documentation for all components"
+git push origin main
+Phase 5 Completion Checklist
+ [ ] Full system integration working
+ [ ] All tests passing
+ [ ] Docker containers configured
+ [ ] Deployed to cloud platform
+ [ ] Documentation complete
+ [ ] Final GitHub push with all code
+Phase 5 Deliverables
+1. ■ Fully integrated system
+2. ■ Test suite with good coverage
+3. ■ Dockerized application
+4. ■ Live demo accessible via URL
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 42
+5. ■ Complete documentation
+6. ■ Production-ready codebase
+Final Deliverables
+Complete Project Deliverables
+1. ■ Source Code: Full codebase on GitHub
+2. ■ ML Models: 3 trained models with >80% accuracy
+3. ■ API: Complete REST API with 30+ endpoints
+4. ■ Dashboard: Professional React dashboard
+5. ■ AI Assistant: Question-answering system
+6. ■ Documentation: Comprehensive docs
+7. ■ Live Demo: Deployed application
+8. ■ Presentation: Interview-ready demo
+GitHub Repository Structure
+ manufacturing-platform/
+■■■ backend/
+■   ■■■ src/
+■   ■   ■■■ config/
+■   ■   ■■■ models/
+■   ■   ■■■ controllers/
+■   ■   ■■■ services/
+■   ■   ■■■ routes/
+■   ■   ■■■ middleware/
+■   ■   ■■■ utils/
+■   ■■■ tests/
+■   ■■■ package.json
+■   ■■■ Dockerfile
+■   ■■■ .env.example
+■■■ frontend/
+■   ■■■ src/
+■   ■   ■■■ components/
+■   ■   ■■■ hooks/
+■   ■   ■■■ services/
+■   ■   ■■■ utils/
+■   ■■■ public/
+■   ■■■ package.json
+■   ■■■ Dockerfile
+■   ■■■ vite.config.js
+■■■ ml-services/
+■   ■■■ src/
+■   ■   ■■■ data_generator/
+■   ■   ■■■ models/
+■   ■   ■■■ api/
+■   ■   ■■■ utils/
+■   ■■■ notebooks/
+■   ■■■ data/
+■   ■■■ models/
+■   ■■■ requirements.txt
+■   ■■■ Dockerfile
+■   ■■■ .env.example
+■■■ docs/
+■   ■■■ api/
+■   ■■■ architecture/
+■   ■■■ user-guide/
+■■■ docker-compose.yml
+■■■ README.md
+Success Metrics & Interview Talking Points
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 43
+Technical Achievements
+ ■ Full-stack implementation (React + Node + Python)
+ ■ 3 ML models with production-ready performance
+ ■ Real-time updates via WebSockets
+ ■ AI assistant with intent classification
+ ■ Professional dashboard with real data
+ ■ Complete deployment pipeline
+Business Impact (Project Assumptions)
+ 30-40% reduction in unplanned downtime
+ 10-15% energy cost savings
+ 20-25% reduction in quality defects
+ $500K+ annual savings potential
+Interview Talking Points
+1. Architecture: "I designed a microservices architecture with separate ML services for scalability."
+2. ML Approach: "I used XGBoost for classification with 85% F1-score and feature importance for interpretability."
+3. Real-time: "WebSocket connections push updates to the dashboard every 30 seconds."
+4. AI Assistant: "The AI answers questions by querying the database and generating context-aware responses."
+5. Deployment: "Full Docker deployment with 3 services orchestrated via Docker Compose."
+Next Steps
+Week 1-2: Phase 1 - Foundation
+ [ ] Set up project structure
+ [ ] Create MongoDB schemas
+ [ ] Build data generator
+ [ ] Implement basic API
+Week 3-4: Phase 2 - ML Models
+ [ ] Train predictive maintenance model
+ [ ] Train energy anomaly model
+ [ ] Train quality defect model
+ [ ] Evaluate and save models
+Week 5-6: Phase 3 - Backend Complete
+ [ ] Implement authentication
+ [ ] Complete all API endpoints
+ [ ] Integrate ML services
+ [ ] Build AI Assistant
+Manufacturing Intelligence & Optimization Platform — Personal Project PRD v2.0
+Page 44
+Week 7-8: Phase 4 - Frontend
+ [ ] Build dashboard
+ [ ] Build machine pages
+ [ ] Build energy pages
+ [ ] Build AI chat interface
+Week 9-10: Phase 5 - Integration
+ [ ] Full system integration
+ [ ] Testing
+ [ ] Deployment
+ [ ] Documentation
+This PRD is your complete roadmap. Start with Phase 1 and build incrementally. Each phase is designed to be
+self-contained and deliver value. Good luck with your project! ■
