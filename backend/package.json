@@ -10,10 +10,10 @@
     "seed": "node src/scripts/seedDatabase.js"
   },
   "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "mongoose": "^8.3.2"
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.2",
+    "mongoose": "^8.24.4"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"
