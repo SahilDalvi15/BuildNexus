@@ -15,9 +15,10 @@ export default function Maintenance() {
     const fetchMachines = async () => {
       try {
         const response = await axios.get(`${API_URL}/machines`);
-        setMachines(response.data);
-        if (response.data.length > 0) {
-          setSelectedMachine(response.data[0].machineId);
+        const machineList = response.data.machines || response.data;
+        setMachines(machineList);
+        if (machineList.length > 0) {
+          setSelectedMachine(machineList[0].machineId);
         }
       } catch (err) {
         console.error("Failed to load machines", err);

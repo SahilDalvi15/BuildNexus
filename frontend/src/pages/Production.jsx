@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Settings, Tool, Activity, AlertTriangle } from 'lucide-react';
+import { Settings, Wrench, Activity, AlertTriangle } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -13,7 +13,7 @@ export default function Production() {
     const fetchMachines = async () => {
       try {
         const response = await axios.get(`${API_URL}/machines`);
-        setMachines(response.data);
+        setMachines(response.data.machines || response.data);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching machines:", err);
@@ -46,7 +46,7 @@ export default function Production() {
 
   const getStatusBadge = (status) => {
     switch(status) {
-      case 'RUNNING': return <span className="badge badge-success">RUNNING</span>;
+      case 'ONLINE': return <span className="badge badge-success">RUNNING</span>;
       case 'MAINTENANCE': return <span className="badge badge-warning">MAINTENANCE</span>;
       case 'OFFLINE': return <span className="badge" style={{ backgroundColor: '#e2e8f0', color: '#475569' }}>OFFLINE</span>;
       case 'ERROR': return <span className="badge badge-warning" style={{ backgroundColor: '#fee2e2', color: '#ef4444' }}>ERROR</span>;
@@ -69,7 +69,7 @@ export default function Production() {
                 <Settings size={20} color="var(--secondary)" />
                 {machine.name}
               </h3>
-              {getStatusBadge(machine.status)}
+              {getStatusBadge(machine.currentStatus)}
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
@@ -98,7 +98,7 @@ export default function Production() {
                 <Activity size={16} /> Metrics
               </button>
               <button className="btn btn-ai" style={{ flex: 1, marginLeft: '0.5rem' }}>
-                <Tool size={16} /> Service
+                <Wrench size={16} /> Service
               </button>
             </div>
           </div>
