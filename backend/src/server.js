@@ -10,6 +10,8 @@ import authRoutes from './routes/authRoutes.js';
 import energyRoutes from './routes/energyRoutes.js';
 import mlRoutes from './routes/mlRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
+import { initSocket } from './services/socketService.js';
+import http from 'http';
 
 dotenv.config();
 
@@ -17,6 +19,10 @@ dotenv.config();
 connectDB();
 
 const app = express();
+const server = http.createServer(app);
+
+// Init Socket.io
+initSocket(server);
 
 // Middleware
 app.use(cors());
@@ -45,6 +51,6 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
 });
