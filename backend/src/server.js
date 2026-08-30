@@ -9,6 +9,7 @@ import sensorRoutes from './routes/sensorRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import energyRoutes from './routes/energyRoutes.js';
 import mlRoutes from './routes/mlRoutes.js';
+import aiRoutes from './routes/aiRoutes.js';
 
 dotenv.config();
 
@@ -36,6 +37,7 @@ app.use('/api/machines', machineRoutes);
 app.use('/api/sensors', sensorRoutes);
 app.use('/api/energy', energyRoutes);
 app.use('/api/ml', mlRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Error Handling Middleware
 app.use(notFound);
