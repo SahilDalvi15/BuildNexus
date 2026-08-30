@@ -6,6 +6,7 @@ import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 
 import machineRoutes from './routes/machineRoutes.js';
 import sensorRoutes from './routes/sensorRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/machines', machineRoutes);
 app.use('/api/sensors', sensorRoutes);
 

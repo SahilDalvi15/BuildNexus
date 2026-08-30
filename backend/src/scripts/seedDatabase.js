@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import bcrypt from 'bcryptjs';
 
 import connectDB from '../config/db.js';
 import Machine from '../models/Machine.js';
@@ -27,10 +28,13 @@ const seedDatabase = async () => {
     await User.deleteMany();
 
     console.log('Creating Admin User...');
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash('admin123', salt);
+
     const admin = new User({
       username: 'admin',
       email: 'admin@buildnexus.local',
-      passwordHash: 'hashed_password_placeholder', // In a real app, use bcrypt to hash
+      passwordHash: passwordHash,
       role: 'ADMIN'
     });
     await admin.save();
