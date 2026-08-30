@@ -37,7 +37,7 @@ const startSimulator = async () => {
       if (!io) return;
 
       // Fetch a few machines to simulate updates for
-      const machines = await Machine.find({ status: 'RUNNING' }).limit(5);
+      const machines = await Machine.find({ currentStatus: 'ONLINE' }).limit(5);
 
       const liveUpdates = machines.map(machine => {
         // Generate random realistic deltas for sensor data
