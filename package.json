@@ -1,0 +1,16 @@
+{
+  "name": "buildnexus",
+  "version": "1.0.0",
+  "description": "BuildNexus: AI-Powered Smart Factory Ecosystem",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install --prefix backend && npm install --prefix frontend && pip install -r ml-services/requirements.txt",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:ml": "python ml-services/src/api/app.py",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:ml\" \"npm run dev:frontend\" --names \"NODE,FLASK,VITE\" --prefix-colors \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
