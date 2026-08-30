@@ -1,9 +1,9 @@
-import { GoogleGenAI } from '@google/genai';
+import Groq from 'groq-sdk';
 import SensorReading from '../models/SensorReading.js';
 
-// Initialize the Gemini client. It will automatically use process.env.GEMINI_API_KEY
+// Initialize the Groq client. It will automatically use process.env.GROQ_API_KEY
 // Note: User can provide the API key in the .env file
-const ai = process.env.GEMINI_API_KEY ? new GoogleGenAI() : null;
+const groq = process.env.GROQ_API_KEY ? new Groq({ apiKey: process.env.GROQ_API_KEY }) : null;
 
 // Helper function to fetch live factory context
 const getLiveFactoryContext = async () => {
@@ -58,11 +58,11 @@ export const askAssistant = async (req, res, next) => {
       throw new Error('Please provide a question');
     }
 
-    if (!ai) {
+    if (!groq) {
       // If no API key is provided yet, return a mock response that still demonstrates the context injection
       const context = await getLiveFactoryContext();
       return res.json({
-        answer: "This is a mock response because the GEMINI_API_KEY is not set in the .env file. \n\nHowever, I am aware of the current factory state!\n\n" + context,
+        answer: "This is a mock response because the GROQ_API_KEY is not set in the .env file. \n\nHowever, I am aware of the current factory state!\n\n" + context,
         contextUsed: true
       });
     }
@@ -78,17 +78,17 @@ export const askAssistant = async (req, res, next) => {
       ${factoryContext}
     `;
 
-    // Call the Gemini API
-    const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: question,
-        config: {
-            systemInstruction: systemInstruction,
-        }
+    // Call the Groq API
+    const response = await groq.chat.completions.create({
+      messages: [
+        { role: 'system', content: systemInstruction },
+        { role: 'user', content: question }
+      ],
+      model: 'openai/gpt-oss-20b', // Using an available model for fast, intelligent generation
     });
 
     res.json({
-      answer: response.text,
+      answer: response.choices[0]?.message?.content || "No response generated.",
       contextUsed: true
     });
   } catch (error) {

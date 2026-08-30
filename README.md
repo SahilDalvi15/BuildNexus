@@ -11,13 +11,13 @@
   - 📈 Random Forest: Quality Score Prediction
   - ⚡ Isolation Forest: Energy Anomaly Detection
 - **Energy Intelligence**: Track live kWh consumption, USD cost impact, and CO2 emissions.
-- **AI Chat Assistant**: Ask a Google Gemini agent grounded in live factory context about your machines.
+- **AI Chat Assistant**: Ask a Groq LLM agent grounded in live factory context about your machines.
 
 ---
 
 ## 🏗️ Architecture Stack
 1. **Frontend**: React + Vite, Recharts, Lucide Icons.
-2. **Backend API**: Node.js + Express, MongoDB, Socket.io, `@google/genai`.
+2. **Backend API**: Node.js + Express, MongoDB, Socket.io, `groq-sdk`.
 3. **ML Microservice**: Python + Flask, Scikit-Learn, XGBoost, Pandas.
 
 ---
@@ -28,7 +28,7 @@
 - Node.js (v18+)
 - Python (v3.10+)
 - MongoDB (Running locally on `mongodb://localhost:27017` or via Atlas)
-- Google Gemini API Key
+- Groq API Key
 
 ### 1. Installation
 
@@ -40,7 +40,7 @@ npm run install:all
 ### 2. Environment Variables
 
 Create your `.env` files using the provided templates:
-- `backend/.env` (Copy from `backend/.env.example` and add your `GEMINI_API_KEY`)
+- `backend/.env` (Copy from `backend/.env.example` and add your `GROQ_API_KEY`)
 - `frontend/.env` (Copy from `frontend/.env.example`)
 
 ### 3. Database Seeding & Model Training
