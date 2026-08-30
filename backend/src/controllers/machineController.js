@@ -1,4 +1,5 @@
 import Machine from '../models/Machine.js';
+import SensorReading from '../models/SensorReading.js';
 
 // @desc    Get all machines
 // @route   GET /api/machines
@@ -25,15 +26,67 @@ export const getMachines = async (req, res, next) => {
   }
 };
 
+// @desc    Get overall factory KPIs
+// @route   GET /api/machines/kpis/overall
+// @access  Public
+export const getMachineKPIs = async (req, res, next) => {
+  try {
+    const latestReadings = await SensorReading.aggregate([
+      { $sort: { timestamp: -1 } },
+      {
+        $group: {
+          _id: "$machineId",
+          oee: { $first: "$derivedMetrics.OEE" },
+          availability: { $first: "$derivedMetrics.availability" },
+          performance: { $first: "$derivedMetrics.performance" },
+          quality: { $first: "$derivedMetrics.quality" },
+          energyConsumption: { $first: "$energyConsumption" },
+          operatingStatus: { $first: "$operatingStatus" }
+        }
+      }
+    ]);
+
+    if (!latestReadings || latestReadings.length === 0) {
+      return res.json({ message: "No KPI data available" });
+    }
+
+    const totalMachines = latestReadings.length;
+    const runningMachines = latestReadings.filter(r => r.operatingStatus === 'RUNNING').length;
+    
+    const avgOEE = latestReadings.reduce((acc, curr) => acc + (curr.oee || 0), 0) / totalMachines;
+    const avgAvailability = latestReadings.reduce((acc, curr) => acc + (curr.availability || 0), 0) / totalMachines;
+    const avgPerformance = latestReadings.reduce((acc, curr) => acc + (curr.performance || 0), 0) / totalMachines;
+    const avgQuality = latestReadings.reduce((acc, curr) => acc + (curr.quality || 0), 0) / totalMachines;
+    
+    const totalEnergy = latestReadings.reduce((acc, curr) => acc + (curr.energyConsumption || 0), 0);
+
+    res.json({
+      factoryStatus: {
+        totalMachines,
+        runningMachines,
+        downMachines: totalMachines - runningMachines
+      },
+      kpis: {
+        averageOEE: avgOEE.toFixed(4),
+        averageAvailability: avgAvailability.toFixed(4),
+        averagePerformance: avgPerformance.toFixed(4),
+        averageQuality: avgQuality.toFixed(4),
+        currentTotalEnergyKwH: totalEnergy.toFixed(2)
+      },
+      timestamp: new Date()
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // @desc    Get a single machine by ID
 // @route   GET /api/machines/:id
 // @access  Public
 export const getMachineById = async (req, res, next) => {
   try {
-    // Note: machineId in DB vs MongoDB _id. We'll search by machineId string first, then fallback to _id
     let machine = await Machine.findOne({ machineId: req.params.id });
     if (!machine) {
-      // Fallback for mongoose ObjectId if needed
       if (req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
         machine = await Machine.findById(req.params.id);
       }

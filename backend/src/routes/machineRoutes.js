@@ -4,7 +4,8 @@ import {
   getMachineById,
   addMachine,
   updateMachine,
-  deleteMachine
+  deleteMachine,
+  getMachineKPIs
 } from '../controllers/machineController.js';
 
 const router = express.Router();
@@ -12,6 +13,9 @@ const router = express.Router();
 router.route('/')
   .get(getMachines)
   .post(addMachine);
+
+router.route('/kpis/overall')
+  .get(getMachineKPIs);
 
 router.route('/:id')
   .get(getMachineById)
