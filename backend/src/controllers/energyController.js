@@ -2,7 +2,7 @@ import SensorReading from '../models/SensorReading.js';
 
 // Constants for calculations
 const ENERGY_COST_PER_KWH = 0.12; // USD
-const CO2_EMISSION_FACTOR = 0.85; // lbs CO2 per kWh
+const CO2_EMISSION_FACTOR = 0.38; // kg CO2 per kWh
 
 // @desc    Get overall energy metrics and costs
 // @route   GET /api/energy/overall
@@ -33,7 +33,7 @@ export const getOverallEnergyMetrics = async (req, res, next) => {
       totalEnergyKwH: totalEnergyKwH.toFixed(2),
       averageEnergyKwH: averageEnergyKwH.toFixed(2),
       totalCostUSD: totalCost.toFixed(2),
-      totalCO2EmissionsLbs: totalCO2.toFixed(2),
+      totalCO2EmissionsKg: totalCO2.toFixed(2),
       timestamp: new Date()
     });
   } catch (error) {
@@ -71,7 +71,7 @@ export const getMachineEnergyMetrics = async (req, res, next) => {
       totalEnergyKwH: totalEnergyKwH.toFixed(2),
       averageEnergyKwH: averageEnergyKwH.toFixed(2),
       totalCostUSD: (totalEnergyKwH * ENERGY_COST_PER_KWH).toFixed(2),
-      totalCO2EmissionsLbs: (totalEnergyKwH * CO2_EMISSION_FACTOR).toFixed(2),
+      totalCO2EmissionsKg: (totalEnergyKwH * CO2_EMISSION_FACTOR).toFixed(2),
     });
   } catch (error) {
     next(error);
