@@ -1,12 +1,13 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Zap, Activity, BrainCircuit, ShieldAlert, Settings } from 'lucide-react';
+import { LayoutDashboard, Zap, Activity, BrainCircuit, ShieldAlert, Settings, Target } from 'lucide-react';
 import './layout.css';
 
 const Sidebar = () => {
   const navItems = [
     { name: 'Plant Overview', path: '/', icon: <LayoutDashboard size={20} />, color: 'var(--primary)' },
     { name: 'Production & KPIs', path: '/production', icon: <Activity size={20} />, color: 'var(--secondary)' },
+    { name: 'Quality Control', path: '/quality', icon: <Target size={20} />, color: 'var(--success)' },
     { name: 'Energy Intelligence', path: '/energy', icon: <Zap size={20} />, color: 'var(--energy)' },
     { name: 'Predictive Maint.', path: '/maintenance', icon: <ShieldAlert size={20} />, color: 'var(--ai)' },
     { name: 'AI Assistant', path: '/ai-assistant', icon: <BrainCircuit size={20} />, color: 'var(--ai)' },

@@ -88,9 +88,9 @@ export default function Energy() {
           <div>
             <h3 style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>Carbon Footprint (CO₂)</h3>
             <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--text-main)' }}>
-              {parseFloat(energyData.totalCO2EmissionsLbs).toLocaleString()} <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>lbs</span>
+              {parseFloat(energyData.totalCO2EmissionsKg).toLocaleString()} <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>kg</span>
             </div>
-            <p style={{ fontSize: '0.75rem', marginTop: '0.25rem' }}>0.85 lbs / kWh factor</p>
+            <p style={{ fontSize: '0.75rem', marginTop: '0.25rem' }}>0.38 kg / kWh factor</p>
           </div>
         </div>
 
@@ -103,7 +103,7 @@ export default function Energy() {
           averaging <strong>{parseFloat(energyData.averageEnergyKwH).toLocaleString()} kWh</strong> per historical reading. 
         </p>
         <p>
-          This equates to a carbon footprint of <strong>{parseFloat(energyData.totalCO2EmissionsLbs).toLocaleString()} lbs of CO₂</strong>. 
+          This equates to a carbon footprint of <strong>{parseFloat(energyData.totalCO2EmissionsKg).toLocaleString()} kg of CO₂</strong>. 
           Monitor these metrics closely to hit the factory sustainability goals.
         </p>
       </div>
