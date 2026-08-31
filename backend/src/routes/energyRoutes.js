@@ -4,12 +4,14 @@ import {
   getMachineEnergyMetrics
 } from '../controllers/energyController.js';
 
+import { protect } from '../middleware/authMiddleware.js';
+
 const router = express.Router();
 
 router.route('/overall')
-  .get(getOverallEnergyMetrics);
+  .get(protect, getOverallEnergyMetrics);
 
 router.route('/:machineId')
-  .get(getMachineEnergyMetrics);
+  .get(protect, getMachineEnergyMetrics);
 
 export default router;
