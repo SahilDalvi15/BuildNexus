@@ -40,6 +40,10 @@ const EnergyReadingSchema = new mongoose.Schema({
     productionVolume: Number,
     ambientTemperature: Number,
     operatingHours: Number
+  },
+  plantId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Plant'
   }
 });
 

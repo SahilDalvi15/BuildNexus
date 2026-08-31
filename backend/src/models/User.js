@@ -14,6 +14,10 @@ const UserSchema = new mongoose.Schema({
     trim: true,
     lowercase: true
   },
+  organizationId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Organization'
+  },
   passwordHash: {
     type: String,
     required: true

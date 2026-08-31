@@ -11,6 +11,14 @@ const MachineSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  organizationId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Organization'
+  },
+  plantId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Plant'
+  },
   type: {
     type: String,
     required: true,

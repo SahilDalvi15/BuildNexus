@@ -39,8 +39,13 @@ const SensorReadingSchema = new mongoose.Schema({
     performance: Number,
     quality: Number
   },
+  plantId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Plant'
+  },
   metadata: {
-    type: mongoose.Schema.Types.Mixed
+    type: Map,
+    of: mongoose.Schema.Types.Mixed
   }
 });
 

@@ -39,6 +39,14 @@ const AlertSchema = new mongoose.Schema({
   predictionId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Prediction'
+  },
+  plantId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Plant'
+  },
+  workOrderId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'WorkOrder'
   }
 });
 
