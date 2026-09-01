@@ -12,6 +12,7 @@ import mlRoutes from './routes/mlRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 import workOrderRoutes from './routes/workOrderRoutes.js';
 import sparePartRoutes from './routes/sparePartRoutes.js';
+import sustainabilityRoutes from './routes/sustainabilityRoutes.js';
 import { initSocket } from './services/socketService.js';
 import http from 'http';
 
@@ -48,6 +49,7 @@ app.use('/api/ml', mlRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/work-orders', workOrderRoutes);
 app.use('/api/parts', sparePartRoutes);
+app.use('/api/sustainability', sustainabilityRoutes);
 
 // Error Handling Middleware
 app.use(notFound);
