@@ -20,10 +20,19 @@ const PredictionSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  plantId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Plant'
+  },
   result: {
     probability: Number,
     confidence: Number,
     timeHorizon: String,
+    rulDays: {
+      min: Number,
+      max: Number,
+      expected: Number
+    },
     contributingFactors: [{
       feature: String,
       importance: Number,
