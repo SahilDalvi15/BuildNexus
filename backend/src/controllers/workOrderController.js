@@ -1,5 +1,6 @@
 import WorkOrder from '../models/WorkOrder.js';
 import Alert from '../models/Alert.js';
+import SparePart from '../models/SparePart.js';
 import crypto from 'crypto';
 
 // @desc    Get all work orders
@@ -59,8 +60,29 @@ export const createWorkOrder = async (req, res) => {
             sourceAlertId,
             recommendedAction,
             assignedTeam,
-            assignedPerson
+            assignedPerson,
+            requiredParts
         } = req.body;
+
+        // Check required parts availability
+        let status = 'OPEN';
+        let waitingForParts = false;
+
+        if (requiredParts && requiredParts.length > 0) {
+            for (const item of requiredParts) {
+                const part = await SparePart.findOne({ partId: item.partId, plantId });
+                if (!part) {
+                    return res.status(400).json({ message: `Part not found: ${item.partId}` });
+                }
+                const available = part.quantity - part.reservedQuantity;
+                if (available < item.quantity) {
+                    waitingForParts = true;
+                }
+            }
+            if (waitingForParts) {
+                status = 'WAITING_FOR_PART';
+            }
+        }
 
         const workOrderId = `WO-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
 
@@ -74,6 +96,8 @@ export const createWorkOrder = async (req, res) => {
             recommendedAction,
             assignedTeam,
             assignedPerson,
+            requiredParts,
+            status,
             auditHistory: [{
                 action: 'CREATED',
                 actor: req.user?._id,
