@@ -26,6 +26,8 @@ import Placeholder from './pages/Placeholder';
 import Assets from './pages/Assets';
 import Lines from './pages/Lines';
 import Sustainability from './pages/Sustainability';
+import WorkOrders from './pages/WorkOrders';
+import SpareParts from './pages/SpareParts';
 
 function App() {
   return (
@@ -48,8 +50,8 @@ function App() {
               {/* V3 Routes */}
               <Route path="assets" element={<Assets />} />
               <Route path="lines" element={<Lines />} />
-              <Route path="work-orders" element={<Placeholder title="Work Orders" />} />
-              <Route path="parts" element={<Placeholder title="Spare Parts" />} />
+              <Route path="work-orders" element={<WorkOrders />} />
+              <Route path="parts" element={<SpareParts />} />
               <Route path="alerts" element={<Placeholder title="Alerts & Notifications" />} />
               <Route path="digital-twin" element={<Placeholder title="Digital Twin" />} />
               <Route path="simulator" element={<Placeholder title="What-If Simulator" />} />
