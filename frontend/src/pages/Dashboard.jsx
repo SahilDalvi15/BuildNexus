@@ -115,33 +115,85 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Live Chart */}
-      <div className="card" style={{ height: '400px', display: 'flex', flexDirection: 'column' }}>
-        <h3 style={{ marginBottom: '1rem' }}>Live Factory Energy & Performance</h3>
-        <div style={{ flex: 1, minHeight: 0 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={liveData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-              <defs>
-                <linearGradient id="colorEnergy" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--energy)" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="var(--energy)" stopOpacity={0}/>
-                </linearGradient>
-                <linearGradient id="colorOee" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-light)" />
-              <XAxis dataKey="time" stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} />
-              <YAxis yAxisId="left" stroke="var(--energy)" fontSize={12} tickLine={false} axisLine={false} />
-              <YAxis yAxisId="right" orientation="right" stroke="var(--primary)" fontSize={12} tickLine={false} axisLine={false} />
-              <Tooltip 
-                contentStyle={{ backgroundColor: 'var(--bg-card)', borderRadius: '8px', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-md)' }}
-              />
-              <Area yAxisId="left" type="monotone" dataKey="energy" stroke="var(--energy)" strokeWidth={2} fillOpacity={1} fill="url(#colorEnergy)" name="Energy (kWh)" />
-              <Area yAxisId="right" type="monotone" dataKey="oee" stroke="var(--primary)" strokeWidth={2} fillOpacity={1} fill="url(#colorOee)" name="OEE (%)" />
-            </AreaChart>
-          </ResponsiveContainer>
+      {/* Charts & Intelligence Panel */}
+      <div className="row g-4">
+        {/* Live Chart */}
+        <div className="col-lg-8">
+          <div className="card h-100" style={{ minHeight: '400px', display: 'flex', flexDirection: 'column' }}>
+            <h3 style={{ marginBottom: '1rem' }}>Live Factory Energy & Performance</h3>
+            <div style={{ flex: 1, minHeight: 0 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={liveData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorEnergy" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--energy)" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="var(--energy)" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorOee" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-light)" />
+                  <XAxis dataKey="time" stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis yAxisId="left" stroke="var(--energy)" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis yAxisId="right" orientation="right" stroke="var(--primary)" fontSize={12} tickLine={false} axisLine={false} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: 'var(--bg-card)', borderRadius: '8px', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-md)' }}
+                  />
+                  <Area yAxisId="left" type="monotone" dataKey="energy" stroke="var(--energy)" strokeWidth={2} fillOpacity={1} fill="url(#colorEnergy)" name="Energy (kWh)" />
+                  <Area yAxisId="right" type="monotone" dataKey="oee" stroke="var(--primary)" strokeWidth={2} fillOpacity={1} fill="url(#colorOee)" name="OEE (%)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        {/* Intelligence Panel */}
+        <div className="col-lg-4">
+          <div className="card h-100 position-relative hover-lift">
+            <h3 className="mb-4">AI Operations Intelligence</h3>
+            
+            <div className="p-3 rounded mb-3" style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+              <div className="d-flex justify-content-between mb-2">
+                <span className="text-danger fw-bold">Critical Risk Detected</span>
+                <span className="badge bg-danger">M-204</span>
+              </div>
+              <p className="text-white small mb-2">Failure predicted in next 48 hours (Probability: 82%).</p>
+              
+              {/* RCA visualization */}
+              <div className="mt-3 border-top pt-2" style={{ borderColor: 'rgba(239, 68, 68, 0.2) !important' }}>
+                <span className="text-secondary small d-block mb-1">Root Cause Analysis (RCA)</span>
+                <div className="d-flex align-items-center mb-1">
+                  <span className="small text-secondary" style={{ width: '80px' }}>Temperature</span>
+                  <div className="progress flex-grow-1" style={{ height: '6px', background: 'rgba(255,255,255,0.1)' }}>
+                    <div className="progress-bar bg-danger" style={{ width: '42%' }}></div>
+                  </div>
+                  <span className="small text-danger ms-2">42%</span>
+                </div>
+                <div className="d-flex align-items-center">
+                  <span className="small text-secondary" style={{ width: '80px' }}>Vibration</span>
+                  <div className="progress flex-grow-1" style={{ height: '6px', background: 'rgba(255,255,255,0.1)' }}>
+                    <div className="progress-bar bg-warning" style={{ width: '29%' }}></div>
+                  </div>
+                  <span className="small text-warning ms-2">29%</span>
+                </div>
+              </div>
+              
+              <button className="btn btn-sm btn-outline-danger w-100 mt-3" style={{ borderRadius: '6px' }}>
+                Create Work Order
+              </button>
+            </div>
+
+            <div className="p-3 rounded" style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
+              <div className="d-flex justify-content-between mb-2">
+                <span className="text-warning fw-bold">Energy Anomaly</span>
+                <span className="badge bg-warning">L-02</span>
+              </div>
+              <p className="text-white small mb-0">Line 02 consuming 15% more power than baseline during idle state.</p>
+            </div>
+            
+          </div>
         </div>
       </div>
     </div>

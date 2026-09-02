@@ -25,6 +25,7 @@ import Placeholder from './pages/Placeholder';
 // V3 Pages
 import Assets from './pages/Assets';
 import Lines from './pages/Lines';
+import Sustainability from './pages/Sustainability';
 
 function App() {
   return (
@@ -52,7 +53,7 @@ function App() {
               <Route path="alerts" element={<Placeholder title="Alerts & Notifications" />} />
               <Route path="digital-twin" element={<Placeholder title="Digital Twin" />} />
               <Route path="simulator" element={<Placeholder title="What-If Simulator" />} />
-              <Route path="sustainability" element={<Placeholder title="Sustainability & CO2" />} />
+              <Route path="sustainability" element={<Sustainability />} />
               <Route path="data" element={<Placeholder title="Data & Integrations" />} />
               <Route path="mlops" element={<Placeholder title="ML Operations" />} />
               <Route path="reports" element={<Placeholder title="Reports" />} />
