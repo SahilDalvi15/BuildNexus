@@ -28,6 +28,8 @@ import Lines from './pages/Lines';
 import Sustainability from './pages/Sustainability';
 import WorkOrders from './pages/WorkOrders';
 import SpareParts from './pages/SpareParts';
+import DigitalTwin from './pages/DigitalTwin';
+import Simulator from './pages/Simulator';
 
 function App() {
   return (
@@ -53,8 +55,8 @@ function App() {
               <Route path="work-orders" element={<WorkOrders />} />
               <Route path="parts" element={<SpareParts />} />
               <Route path="alerts" element={<Placeholder title="Alerts & Notifications" />} />
-              <Route path="digital-twin" element={<Placeholder title="Digital Twin" />} />
-              <Route path="simulator" element={<Placeholder title="What-If Simulator" />} />
+              <Route path="digital-twin" element={<DigitalTwin />} />
+              <Route path="simulator" element={<Simulator />} />
               <Route path="sustainability" element={<Sustainability />} />
               <Route path="data" element={<Placeholder title="Data & Integrations" />} />
               <Route path="mlops" element={<Placeholder title="ML Operations" />} />
