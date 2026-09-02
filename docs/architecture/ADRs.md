@@ -1,31 +1,53 @@
 # Architecture Decision Records (ADRs)
 
-## ADR-001: Separation of Backend and ML Services
-**Date:** 2026-08-30  
-**Status:** Accepted  
+This document tracks the core architectural decisions for BuildNexus V3.0.
 
-**Context:** The application requires serving standard web API traffic (CRUD, Auth) as well as heavy machine learning inference.  
-**Decision:** We decided to split the backend into two distinct microservices: A Node.js/Express service for the primary API gateway, and a Python/Flask service for ML inference.  
-**Consequences:** 
-* *Positive:* Python is the native language for scikit-learn/XGBoost, making model loading trivial. Node.js handles async I/O (WebSockets, MongoDB) much more efficiently.
-* *Negative:* Increased deployment complexity (requires Docker Compose to orchestrate multiple containers).
+## ADR-001: MERN Stack with Flask ML Proxy
+**Date:** September 2026
+**Status:** Accepted
 
-## ADR-002: Use of MongoDB for Telemetry Data
-**Date:** 2026-08-30  
-**Status:** Accepted  
+### Context
+BuildNexus requires a high-performance web dashboard (React), scalable document storage (MongoDB) for varying JSON structures (sensor telemetry), robust API handling (Express/Node), and advanced machine learning capabilities (scikit-learn/pandas).
 
-**Context:** Industrial IoT sensors produce massive amounts of time-series data.  
-**Decision:** We chose MongoDB (NoSQL) over a traditional relational database (e.g., PostgreSQL).  
-**Consequences:** 
-* *Positive:* Flexible schemas allow different machines to send different sensor payloads without rigid migrations.
-* *Negative:* For true production scale, a dedicated Time-Series Database (TSDB) like InfluxDB might be required, but MongoDB suffices for the MVP prototype.
+### Decision
+We chose the MERN (MongoDB, Express, React, Node.js) stack for the primary architecture. However, since Python is the industry standard for ML and data science, we decoupled the ML inference into a separate Flask API (`ml-services`).
+- The Node.js backend serves as an orchestration layer, proxying requests to the Flask ML service.
+- The Flask service is stateless and purely handles mathematical inference (predictive maintenance, anomaly detection, RUL calculations).
 
-## ADR-003: JWT for Authentication
-**Date:** 2026-08-31  
-**Status:** Accepted  
+### Consequences
+- **Positive:** Leverages the best tools for each job (Node for high-concurrency I/O, Python for heavy computation).
+- **Negative:** Introduces network latency between the Node.js API and the Flask service. We mitigated this by returning immediate 202 Accepted responses for long-running batch predictions if needed, though most inferences are fast enough for synchronous proxying.
 
-**Context:** We need to secure the platform with Role-Based Access Control (RBAC).  
-**Decision:** We implemented stateless JSON Web Tokens (JWT) rather than session-based cookies.  
-**Consequences:** 
-* *Positive:* Highly scalable, works natively with mobile apps if we build them later, and easy to pass between our Microservices.
-* *Negative:* Token revocation is difficult without implementing a centralized token blacklist.
+## ADR-002: Event-Driven Telemetry Ingestion
+**Date:** September 2026
+**Status:** Accepted
+
+### Context
+Factory IoT sensors transmit telemetry data at high frequencies. Directly writing each payload to the database using REST controllers creates severe bottlenecks and database locks.
+
+### Decision
+We implemented a lightweight event-driven ingestion pipeline within the Node.js monolithic architecture.
+- Incoming HTTP requests from Edge Gateways are received by `/api/sensors/ingest`.
+- The controller instantly validates the payload and emits a `TELEMETRY_RECEIVED` event to an internal `EventBus`.
+- An independent `ingestionWorker.js` listens to this bus, aggregates the payloads in memory, and performs bulk database inserts every X seconds or Y messages.
+
+### Consequences
+- **Positive:** Massively increases ingestion throughput. The HTTP response is immediate (202 Accepted).
+- **Negative:** Risk of data loss if the Node.js process crashes before the in-memory buffer is flushed to MongoDB. For mission-critical deployments, this would be swapped out for a robust message broker like Kafka or RabbitMQ.
+
+## ADR-003: Hierarchical Multi-Tenant Data Model
+**Date:** September 2026
+**Status:** Accepted
+
+### Context
+BuildNexus must support enterprise clients managing multiple global factories, each with specific zones and production lines containing assets. A flat structure makes querying complex and inefficient.
+
+### Decision
+We adopted a strict parent-child schema hierarchy for the Digital Twin:
+`Organization -> Plant -> PlantZone -> ProductionLine -> Machine`
+- Data is normalized where appropriate (e.g., Users reference Plants, Machines reference ProductionLines).
+- The `/api/digital-twin/layout` endpoint uses MongoDB aggregation pipelines to eagerly fetch and assemble the entire hierarchy in a single network request.
+
+### Consequences
+- **Positive:** Enables powerful spatial visualizations (2D digital twin views) and hierarchical access control.
+- **Negative:** Complex aggregation pipelines can be slow if not properly indexed. We ensure indices are placed on `orgId`, `plantId`, `zoneId`, and `lineId`.
