@@ -1,57 +1,51 @@
-# BuildNexus Operations Runbook
+# BuildNexus V3.0 Production Runbook
 
-This document provides instructions for deploying, operating, and troubleshooting the BuildNexus platform.
+This document provides standardized incident response procedures for common failures in the BuildNexus production environment.
 
-## 1. Local Development (Without Docker)
-To run the platform locally for development:
+## 1. High-Frequency Telemetry Dropped (Ingestion Lag)
 
-1. **Start MongoDB:** Ensure MongoDB is running on `localhost:27017`.
-2. **Start Backend (Node.js):**
-   ```bash
-   cd backend
-   npm install
-   npm run dev
-   ```
-   *Runs on port 5000*
-3. **Start ML Services (Python):**
-   ```bash
-   cd ml-services
-   python -m venv venv
-   source venv/Scripts/activate # Windows
-   pip install -r requirements.txt
-   python src/api/app.py
-   ```
-   *Runs on port 5001*
-4. **Start Frontend (React):**
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
-   *Runs on port 5173*
+### Symptoms
+- Frontend Dashboard shows delayed "Live Metrics" (stale timestamps).
+- Gateway reports `429 Too Many Requests` or network timeouts.
+- Node.js process CPU spikes to 100%.
 
-## 2. Production Deployment (Docker Compose)
-To deploy the entire stack using Docker:
+### Root Cause
+The `ingestionWorker.js` is failing to flush the internal event buffer to MongoDB fast enough, causing memory pressure and event loop blocking.
 
-```bash
-docker-compose up --build -d
-```
-* **Frontend:** http://localhost:80
-* **Backend API:** http://localhost:5000
-* **ML API:** http://localhost:5001
+### Resolution Steps
+1. **Scale Out Node API:** Telemetry ingestion is stateless before the buffer. Deploy additional Node.js instances behind the load balancer to distribute the HTTP POST load.
+2. **Increase Batch Size:** Temporarily modify `ingestionWorker.js` configuration to flush every `1000` records instead of `100` to reduce MongoDB I/O overhead.
+3. **Check MongoDB IOPS:** Ensure the MongoDB cluster has sufficient IOPS provisioning for write-heavy workloads.
+4. **Transition to Kafka (Long Term):** If this occurs frequently, the in-memory Node `EventEmitter` must be replaced with a distributed message broker (Apache Kafka).
 
-## 3. Database Seeding
-If the database is empty, you can seed it with the synthetic dataset:
-```bash
-cd backend
-npm run seed
-```
-*Warning: This may overwrite existing machine data.*
+---
 
-## 4. Troubleshooting
-* **Symptom:** UI shows "Failed to load machines"
-  * **Fix:** Check if backend is running. Check CORS settings in `backend/src/server.js`.
-* **Symptom:** ML predictions fail or return 500
-  * **Fix:** Ensure the Python ML service is running on port 5001. Check the `ML_SERVICE_URL` environment variable in the backend `.env`.
-* **Symptom:** AI Assistant returns 500
-  * **Fix:** Verify the `GROQ_API_KEY` is set in the backend `.env` and that you have remaining quota.
+## 2. ML Inference Proxy Failure
+
+### Symptoms
+- 500 Internal Server Errors on the `/api/simulator/run` endpoint.
+- "ML Model Unavailable" warnings on the Frontend UI.
+- Node API logs show `ECONNREFUSED` targeting `localhost:5001`.
+
+### Root Cause
+The Flask Python `ml-services` container has crashed or is overwhelmed by concurrent inference requests from the Node API.
+
+### Resolution Steps
+1. **Restart Flask Service:** Attempt a rolling restart of the Python ML pods/containers.
+2. **Check Model Memory Leaks:** Analyze Python memory usage. Large Pandas DataFrames or un-pickled Scikit-Learn objects may be causing OOM (Out of Memory) kills by the OS.
+3. **Enable Circuit Breaker:** In the Node.js ML routing controller, ensure the circuit breaker is active. If Flask is down, Node should return cached/heuristic data or gracefully degrade the UI (e.g., hiding the RUL overlays) rather than crashing.
+
+---
+
+## 3. Digital Twin Layout Rendering Too Slow
+
+### Symptoms
+- Frontend `DigitalTwin.jsx` spins for > 5 seconds before loading.
+- Database slow query logs indicate long execution times on `/api/digital-twin/layout`.
+
+### Root Cause
+The MongoDB aggregation pipeline joining `Plant` -> `PlantZone` -> `ProductionLine` -> `Machine` is performing full collection scans.
+
+### Resolution Steps
+1. **Verify Indices:** Run `db.machines.getIndexes()` and ensure `line` is indexed. Ensure `ProductionLine` has `zone` indexed.
+2. **Enable Redis Caching:** Digital twin hierarchies change rarely (factories aren't physically reconfigured every day). Enable a 1-hour Redis cache on the layout endpoint, invalidating only when an Admin triggers a structural update.
