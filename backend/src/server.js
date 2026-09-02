@@ -14,6 +14,7 @@ import workOrderRoutes from './routes/workOrderRoutes.js';
 import sparePartRoutes from './routes/sparePartRoutes.js';
 import sustainabilityRoutes from './routes/sustainabilityRoutes.js';
 import qualityRoutes from './routes/qualityRoutes.js';
+import digitalTwinRoutes from './routes/digitalTwinRoutes.js';
 import { initSocket } from './services/socketService.js';
 import { startIngestionWorker } from './services/ingestionWorker.js';
 import http from 'http';
@@ -56,6 +57,7 @@ app.use('/api/work-orders', workOrderRoutes);
 app.use('/api/parts', sparePartRoutes);
 app.use('/api/sustainability', sustainabilityRoutes);
 app.use('/api/quality', qualityRoutes);
+app.use('/api/digital-twin', digitalTwinRoutes);
 
 // Error Handling Middleware
 app.use(notFound);

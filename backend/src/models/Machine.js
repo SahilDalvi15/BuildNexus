@@ -25,9 +25,19 @@ const MachineSchema = new mongoose.Schema({
     index: true
   },
   productionLine: {
-    type: String,
-    required: true,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'ProductionLine',
     index: true
+  },
+  zoneId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'PlantZone',
+    index: true
+  },
+  spatialCoordinates: {
+    x: { type: Number },
+    y: { type: Number },
+    orientation: { type: Number, default: 0 } // degrees
   },
   installationDate: {
     type: Date,
