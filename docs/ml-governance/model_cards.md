@@ -1,88 +1,49 @@
-# Machine Learning Model Cards
+# ML Governance & Model Cards
 
-This document outlines the governance and metadata for the machine learning models deployed in the BuildNexus Manufacturing Intelligence Platform.
+This document outlines the capabilities, constraints, and ethical considerations for the machine learning models deployed within BuildNexus V3.0, adhering to the PRD (Section 21) requirements.
 
-> **Disclaimer:** These models are trained on synthetic data for demonstration purposes. They are not intended for deployment in real-world Saint-Gobain facilities without retraining on actual telemetry data.
-
----
-
-## 1. Predictive Maintenance Model
+## 1. Predictive Maintenance Model (RUL)
 
 ### Model Details
-* **Model Name:** `predictive_maintenance_model`
-* **Version:** 1.0.0
-* **Algorithm:** XGBoost Classifier
-* **Training Date:** 2026-08-30
+- **Architecture:** Random Forest Regressor / Gradient Boosting Machine.
+- **Input Features:** Temperature, Vibration, Power Consumption, Operating Hours.
+- **Target Output:** Remaining Useful Life (RUL) in days, Risk Level (CRITICAL, WARNING, SAFE), and Failure Probability.
 
-### Intended Use
-* **Primary Use Case:** Predict the probability of a machine failing within a 48-hour horizon based on current and historical telemetry.
-* **Out-of-Scope Use:** Not to be used to automatically shut down equipment without human intervention.
+### Training Data & Reproducibility
+- Trained on simulated NASADataset (CMAPSS) overlaid with synthetic industrial data.
+- **Reproducible Training:** A training pipeline script (`train_quality_prediction.py`) handles identical seed initialization and cross-validation splits.
 
-### Data & Features
-* **Dataset:** Synthetic telemetry data (`synthetic_sensor_data.csv`).
-* **Features Used:** `temperature`, `vibration`, `pressure`, `current`, `energy_kwh`, `operating_hours`, `production_count`, `temp_rolling_mean`, `vib_rolling_mean`, `temp_rate`.
-* **Target:** Binary classification (`failure_imminent` - 1 or 0).
+### Performance Metrics & Thresholds
+- **Target Thresholds:** Requires Mean Absolute Error (MAE) < 15 days on test set.
+- **Precision/Recall (Failure Classification):** Optimized for high recall (>90%) to avoid missing critical failures, at the expense of precision (more false positives).
 
-### Evaluation Metrics
-* **F1-Score:** ~0.85
-* **Precision:** 0.83
-* **Recall:** 0.87
-* **ROC-AUC:** 0.93
-
-### Considerations & Limitations
-* **Thresholds:** A threshold of `0.70` probability is used to categorize risk as "HIGH".
-* **Failure Modes:** False positives may occur during planned stress testing. The model is highly sensitive to sudden vibration spikes which may occasionally represent sensor noise rather than mechanical wear.
-
----
+### Limitations & Ethical Considerations
+- **Causality vs Correlation:** The model relies on correlational data. High vibration predicts failure, but the model cannot inherently determine *why* vibration increased (e.g., loose bolt vs lack of lubrication). Root Cause Analysis (RCA) overlays are estimates based on feature importance (SHAP values), not definitive engineering diagnoses.
 
 ## 2. Energy Anomaly Detection Model
 
 ### Model Details
-* **Model Name:** `energy_anomaly_model`
-* **Version:** 1.0.0
-* **Algorithm:** Isolation Forest (Unsupervised)
-* **Training Date:** 2026-08-30
+- **Architecture:** Isolation Forest / One-Class SVM.
+- **Input Features:** Current Energy Consumption, Production Rate, Time of Day.
+- **Target Output:** Anomaly Score, Boolean Flag (Is_Anomaly).
 
-### Intended Use
-* **Primary Use Case:** Identify abnormal spikes or drops in energy consumption that deviate from expected operational profiles.
-* **Out-of-Scope Use:** Cannot identify *what* specific component is causing the anomaly, only that the total draw is abnormal.
+### Training Data & Reproducibility
+- Unsupervised learning. Trained on baseline "normal" operating periods collected over 6 months of stable factory operations.
 
-### Data & Features
-* **Dataset:** Normal operation subset of synthetic telemetry data.
-* **Features Used:** `energy_kwh`, `production_count`, `hour_of_day`, `day_of_week`.
+### Performance Metrics & Thresholds
+- **Threshold:** Dynamic thresholding based on the 95th percentile of anomaly scores during validation.
+- **Latency:** Inference is performed via the Flask API proxy and takes ~50ms. 
 
-### Evaluation Metrics
-* **F1-Score:** ~0.78 (on synthetic labeled anomalies)
-* **Precision:** 0.75
-* **Recall:** 0.82
+### Limitations & Ethical Considerations
+- **Concept Drift:** Factory configurations change (new machines, differing production schedules). The model requires retraining every 30 days or after major line reconfiguration to prevent "normal" operations from being flagged as anomalies.
 
-### Considerations & Limitations
-* **Thresholds:** A contamination rate of `0.05` was assumed during training. 
-* **Failure Modes:** Shifts in production schedules (e.g., unexpected weekend shifts) will trigger false anomalies unless the model is retrained on the new schedule baseline.
-
----
-
-## 3. Quality Defect Prediction Model
+## 3. Quality Prediction Model
 
 ### Model Details
-* **Model Name:** `quality_prediction_model`
-* **Version:** 1.0.0
-* **Algorithm:** XGBoost Regressor (Mapped to Probability)
-* **Training Date:** 2026-08-31
+- **Architecture:** Logistic Regression / XGBoost Classifier.
+- **Input Features:** Line speed, Raw material variance, Temperature profiles.
+- **Target Output:** Probability of Defect.
 
-### Intended Use
-* **Primary Use Case:** Predict the likelihood of manufacturing defects based on real-time operating parameters to serve as decision-support for operators.
-* **Out-of-Scope Use:** Not a causal model. Changing parameters *exactly* as recommended does not guarantee a defect-free product; it only moves the machine back to a statistically safer operating zone.
-
-### Data & Features
-* **Dataset:** Synthetic telemetry data.
-* **Features Used:** `temperature`, `pressure`, `current`, `production_speed`.
-* **Target:** Continuous `quality_score` (0-100), transformed into a defect probability.
-
-### Evaluation Metrics
-* **R² Score:** 0.85
-* **RMSE:** 4.2
-* **MAE:** 3.1
-
-### Considerations & Limitations
-* **Failure Modes:** The model assumes raw material quality is constant. If a bad batch of raw material is introduced, the model will vastly underestimate defect risk.
+### Limitations & Ethical Considerations
+- **Bias:** If historical data includes systemic flaws (e.g., rejecting parts due to aesthetic flaws that don't affect function), the model will replicate this bias.
+- **Human-in-the-Loop:** Predictions must be reviewed by QA personnel. The model should augment, not replace, physical quality inspections.
