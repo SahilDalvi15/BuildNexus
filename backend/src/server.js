@@ -15,6 +15,7 @@ import sparePartRoutes from './routes/sparePartRoutes.js';
 import sustainabilityRoutes from './routes/sustainabilityRoutes.js';
 import qualityRoutes from './routes/qualityRoutes.js';
 import { initSocket } from './services/socketService.js';
+import { startIngestionWorker } from './services/ingestionWorker.js';
 import http from 'http';
 
 dotenv.config();
@@ -27,6 +28,9 @@ const server = http.createServer(app);
 
 // Init Socket.io
 initSocket(server);
+
+// Start Background Workers
+startIngestionWorker();
 
 // Middleware
 app.use(cors());

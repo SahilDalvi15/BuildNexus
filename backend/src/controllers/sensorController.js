@@ -1,4 +1,5 @@
 import SensorReading from '../models/SensorReading.js';
+import eventBus from '../services/eventBus.js';
 
 // @desc    Get latest readings for all machines
 // @route   GET /api/sensors/latest
@@ -66,6 +67,47 @@ export const getLatestReadingForMachine = async (req, res, next) => {
       res.status(404);
       throw new Error('No readings found for this machine');
     }
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Ingest telemetry via Event Bus (Decoupled)
+// @route   POST /api/sensors/ingest
+// @access  Private (Edge Gateway)
+export const ingestTelemetry = async (req, res, next) => {
+  try {
+    const payload = req.body;
+    
+    // Instead of saving directly to DB, emit to event bus
+    eventBus.emit('telemetry:ingest', payload);
+    
+    res.status(202).json({ message: 'Telemetry received and queued for processing' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Store-and-forward bulk upload from Edge Gateway
+// @route   POST /api/sensors/bulk-ingest
+// @access  Private (Edge Gateway)
+export const bulkIngest = async (req, res, next) => {
+  try {
+    const { gatewayId, readings } = req.body;
+    
+    if (!readings || !Array.isArray(readings)) {
+      return res.status(400).json({ message: 'Invalid payload: readings must be an array' });
+    }
+
+    // Process bulk readings through event bus
+    readings.forEach(reading => {
+      eventBus.emit('telemetry:ingest', { ...reading, gatewayId, isStoreAndForward: true });
+    });
+
+    res.status(202).json({ 
+      message: 'Bulk telemetry received and queued',
+      count: readings.length 
+    });
   } catch (error) {
     next(error);
   }
