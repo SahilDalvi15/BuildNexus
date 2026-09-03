@@ -33,6 +33,8 @@ import Simulator from './pages/Simulator';
 import Alerts from './pages/Alerts';
 import MLOps from './pages/MLOps';
 import DataIntegrations from './pages/DataIntegrations';
+import AuditLogs from './pages/AuditLogs';
+import Users from './pages/Users';
 
 function App() {
   return (
@@ -64,8 +66,8 @@ function App() {
               <Route path="data" element={<DataIntegrations />} />
               <Route path="mlops" element={<MLOps />} />
               <Route path="reports" element={<Placeholder title="Reports" />} />
-              <Route path="audit" element={<Placeholder title="Audit Logs" />} />
-              <Route path="users" element={<Placeholder title="User Management" />} />
+              <Route path="audit" element={<AuditLogs />} />
+              <Route path="users" element={<Users />} />
               <Route path="health" element={<Placeholder title="Platform Health" />} />
             </Route>
           </Routes>
