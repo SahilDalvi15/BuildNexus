@@ -31,6 +31,8 @@ import SpareParts from './pages/SpareParts';
 import DigitalTwin from './pages/DigitalTwin';
 import Simulator from './pages/Simulator';
 import Alerts from './pages/Alerts';
+import MLOps from './pages/MLOps';
+import DataIntegrations from './pages/DataIntegrations';
 
 function App() {
   return (
@@ -59,8 +61,8 @@ function App() {
               <Route path="digital-twin" element={<DigitalTwin />} />
               <Route path="simulator" element={<Simulator />} />
               <Route path="sustainability" element={<Sustainability />} />
-              <Route path="data" element={<Placeholder title="Data & Integrations" />} />
-              <Route path="mlops" element={<Placeholder title="ML Operations" />} />
+              <Route path="data" element={<DataIntegrations />} />
+              <Route path="mlops" element={<MLOps />} />
               <Route path="reports" element={<Placeholder title="Reports" />} />
               <Route path="audit" element={<Placeholder title="Audit Logs" />} />
               <Route path="users" element={<Placeholder title="User Management" />} />
