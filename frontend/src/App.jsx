@@ -35,6 +35,8 @@ import MLOps from './pages/MLOps';
 import DataIntegrations from './pages/DataIntegrations';
 import AuditLogs from './pages/AuditLogs';
 import Users from './pages/Users';
+import PlatformHealth from './pages/PlatformHealth';
+import Reports from './pages/Reports';
 
 function App() {
   return (
@@ -65,10 +67,10 @@ function App() {
               <Route path="sustainability" element={<Sustainability />} />
               <Route path="data" element={<DataIntegrations />} />
               <Route path="mlops" element={<MLOps />} />
-              <Route path="reports" element={<Placeholder title="Reports" />} />
+              <Route path="reports" element={<Reports />} />
               <Route path="audit" element={<AuditLogs />} />
               <Route path="users" element={<Users />} />
-              <Route path="health" element={<Placeholder title="Platform Health" />} />
+              <Route path="health" element={<PlatformHealth />} />
             </Route>
           </Routes>
         </Router>
