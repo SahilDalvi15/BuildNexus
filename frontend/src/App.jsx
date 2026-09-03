@@ -30,6 +30,7 @@ import WorkOrders from './pages/WorkOrders';
 import SpareParts from './pages/SpareParts';
 import DigitalTwin from './pages/DigitalTwin';
 import Simulator from './pages/Simulator';
+import Alerts from './pages/Alerts';
 
 function App() {
   return (
@@ -54,7 +55,7 @@ function App() {
               <Route path="lines" element={<Lines />} />
               <Route path="work-orders" element={<WorkOrders />} />
               <Route path="parts" element={<SpareParts />} />
-              <Route path="alerts" element={<Placeholder title="Alerts & Notifications" />} />
+              <Route path="alerts" element={<Alerts />} />
               <Route path="digital-twin" element={<DigitalTwin />} />
               <Route path="simulator" element={<Simulator />} />
               <Route path="sustainability" element={<Sustainability />} />
