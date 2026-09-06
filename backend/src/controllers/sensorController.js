@@ -1,25 +1,15 @@
 import SensorReading from '../models/SensorReading.js';
-import eventBus from '../services/eventBus.js';
+import TelemetryQueue from '../models/TelemetryQueue.js';
 
 // @desc    Get latest readings for all machines
 // @route   GET /api/sensors/latest
 // @access  Public
 export const getLatestReadings = async (req, res, next) => {
   try {
-    // We can use an aggregation pipeline to get the latest reading per machine
     const latestReadings = await SensorReading.aggregate([
-      {
-        $sort: { timestamp: -1 }
-      },
-      {
-        $group: {
-          _id: "$machineId",
-          latestReading: { $first: "$$ROOT" }
-        }
-      }
+      { $sort: { timestamp: -1 } },
+      { $group: { _id: "$machineId", latestReading: { $first: "$$ROOT" } } }
     ]);
-
-    // Format the response to return an array of the documents
     res.json(latestReadings.map(reading => reading.latestReading));
   } catch (error) {
     next(error);
@@ -34,7 +24,6 @@ export const getSensorHistory = async (req, res, next) => {
     const { machineId } = req.params;
     const limit = Number(req.query.limit) || 50;
     
-    // Optional date filtering
     const query = { machineId };
     if (req.query.startDate && req.query.endDate) {
       query.timestamp = {
@@ -72,17 +61,17 @@ export const getLatestReadingForMachine = async (req, res, next) => {
   }
 };
 
-// @desc    Ingest telemetry via Event Bus (Decoupled)
+// @desc    Ingest telemetry via MongoDB Queue
 // @route   POST /api/sensors/ingest
 // @access  Private (Edge Gateway)
 export const ingestTelemetry = async (req, res, next) => {
   try {
     const payload = req.body;
     
-    // Instead of saving directly to DB, emit to event bus
-    eventBus.emit('telemetry:ingest', payload);
+    // Write instantly to the queue collection
+    await TelemetryQueue.create({ payload });
     
-    res.status(202).json({ message: 'Telemetry received and queued for processing' });
+    res.status(202).json({ message: 'Telemetry received and queued for processing in MongoDB' });
   } catch (error) {
     next(error);
   }
@@ -99,13 +88,14 @@ export const bulkIngest = async (req, res, next) => {
       return res.status(400).json({ message: 'Invalid payload: readings must be an array' });
     }
 
-    // Process bulk readings through event bus
-    readings.forEach(reading => {
-      eventBus.emit('telemetry:ingest', { ...reading, gatewayId, isStoreAndForward: true });
-    });
+    // Process bulk readings into the Mongo queue
+    const queueDocs = readings.map(reading => ({
+      payload: { ...reading, gatewayId, isStoreAndForward: true }
+    }));
+    await TelemetryQueue.insertMany(queueDocs);
 
     res.status(202).json({ 
-      message: 'Bulk telemetry received and queued',
+      message: 'Bulk telemetry received and queued in MongoDB',
       count: readings.length 
     });
   } catch (error) {
