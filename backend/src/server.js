@@ -7,6 +7,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import connectDB from './config/db.js';
 import { errorHandler, notFound } from './middleware/errorMiddleware.js';
+import { trackMetrics, getMetrics } from './controllers/metricsController.js';
 
 import machineRoutes from './routes/machineRoutes.js';
 import sensorRoutes from './routes/sensorRoutes.js';
@@ -73,6 +74,9 @@ if (cluster.isPrimary) {
   app.use(cors());
   app.use(express.json());
 
+  // Prometheus Metrics Tracking Middleware
+  app.use(trackMetrics);
+
   // API Health Check
   app.get('/api/health', (req, res) => {
     res.status(200).json({
@@ -81,6 +85,9 @@ if (cluster.isPrimary) {
       timestamp: new Date().toISOString()
     });
   });
+
+  // DevOps Metrics Endpoint
+  app.get('/api/metrics', getMetrics);
 
   // Routes
   app.use('/api/auth', authRoutes);
