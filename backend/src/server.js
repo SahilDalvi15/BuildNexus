@@ -3,6 +3,8 @@ import os from 'os';
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import connectDB from './config/db.js';
 import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 
@@ -55,6 +57,19 @@ if (cluster.isPrimary) {
   startIngestionWorker();
 
   // Middleware
+  // Security Headers
+  app.use(helmet());
+
+  // Global Rate Limiter: 1000 requests per 15 minutes per IP
+  const globalLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 1000,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: 'Too many requests from this IP, please try again after 15 minutes'
+  });
+  app.use(globalLimiter);
+
   app.use(cors());
   app.use(express.json());
 
