@@ -37,6 +37,7 @@ import AuditLogs from './pages/AuditLogs';
 import Users from './pages/Users';
 import PlatformHealth from './pages/PlatformHealth';
 import Reports from './pages/Reports';
+import ImpactCenter from './pages/ImpactCenter';
 
 function App() {
   return (
@@ -62,6 +63,7 @@ function App() {
               <Route path="work-orders" element={<WorkOrders />} />
               <Route path="parts" element={<SpareParts />} />
               <Route path="alerts" element={<Alerts />} />
+              <Route path="impact-center" element={<ImpactCenter />} />
               <Route path="digital-twin" element={<DigitalTwin />} />
               <Route path="simulator" element={<Simulator />} />
               <Route path="sustainability" element={<Sustainability />} />

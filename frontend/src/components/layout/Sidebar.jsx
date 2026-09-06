@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Activity, Zap, ShieldAlert, Target, Box, 
   GitBranch, Wrench, Package, Bell, Map, Calculator, 
   BrainCircuit, Leaf, Database, Cpu, FileText, History, 
-  Users, ActivitySquare, Settings 
+  Users, ActivitySquare, Settings, TrendingUp
 } from 'lucide-react';
 import './layout.css';
 
@@ -20,6 +20,7 @@ const Sidebar = () => {
     { name: 'Work Orders', path: '/work-orders', icon: <Wrench size={20} /> },
     { name: 'Spare Parts', path: '/parts', icon: <Package size={20} /> },
     { name: 'Alerts', path: '/alerts', icon: <Bell size={20} /> },
+    { name: 'Impact Center', path: '/impact-center', icon: <TrendingUp size={20} /> },
     { name: 'Digital Twin', path: '/digital-twin', icon: <Map size={20} /> },
     { name: 'What-If Simulator', path: '/simulator', icon: <Calculator size={20} /> },
     { name: 'AI Ops Copilot', path: '/ai-assistant', icon: <BrainCircuit size={20} /> },
