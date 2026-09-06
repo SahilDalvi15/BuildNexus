@@ -15,6 +15,7 @@ import authRoutes from './routes/authRoutes.js';
 import energyRoutes from './routes/energyRoutes.js';
 import mlRoutes from './routes/mlRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
+import impactRoutes from './routes/impactRoutes.js';
 import workOrderRoutes from './routes/workOrderRoutes.js';
 import sparePartRoutes from './routes/sparePartRoutes.js';
 import sustainabilityRoutes from './routes/sustainabilityRoutes.js';
@@ -96,6 +97,7 @@ if (cluster.isPrimary) {
   app.use('/api/energy', energyRoutes);
   app.use('/api/ml', mlRoutes);
   app.use('/api/ai', aiRoutes);
+  app.use('/api/impacts', impactRoutes);
   app.use('/api/work-orders', workOrderRoutes);
   app.use('/api/parts', sparePartRoutes);
   app.use('/api/sustainability', sustainabilityRoutes);
