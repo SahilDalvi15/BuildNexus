@@ -1,3 +1,5 @@
+import cluster from 'cluster';
+import os from 'os';
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -22,51 +24,70 @@ import http from 'http';
 
 dotenv.config();
 
-// Connect to database
-connectDB();
+const numCPUs = os.cpus().length;
 
-const app = express();
-const server = http.createServer(app);
+if (cluster.isPrimary) {
+  console.log(`Primary ${process.pid} is running`);
+  console.log(`Forking ${numCPUs} API workers for enterprise scaling...`);
 
-// Init Socket.io
-initSocket(server);
+  // Fork workers.
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
 
-// Start Background Workers
-startIngestionWorker();
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-
-// API Health Check
-app.get('/api/health', (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    message: 'BuildNexus API is running',
-    timestamp: new Date().toISOString()
+  // Graceful worker respawning
+  cluster.on('exit', (worker, code, signal) => {
+    console.warn(`Worker ${worker.process.pid} died (Code: ${code}). Respawning...`);
+    cluster.fork();
   });
-});
+} else {
+  // Worker Process - Connect to database
+  connectDB();
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/machines', machineRoutes);
-app.use('/api/sensors', sensorRoutes);
-app.use('/api/energy', energyRoutes);
-app.use('/api/ml', mlRoutes);
-app.use('/api/ai', aiRoutes);
-app.use('/api/work-orders', workOrderRoutes);
-app.use('/api/parts', sparePartRoutes);
-app.use('/api/sustainability', sustainabilityRoutes);
-app.use('/api/quality', qualityRoutes);
-app.use('/api/digital-twin', digitalTwinRoutes);
-app.use('/api/simulator', simulatorRoutes);
+  const app = express();
+  const server = http.createServer(app);
 
-// Error Handling Middleware
-app.use(notFound);
-app.use(errorHandler);
+  // Init Socket.io
+  initSocket(server);
 
-const PORT = process.env.PORT || 5000;
+  // Start Background Workers only on the first worker (or implement distributed locking)
+  // For simplicity, we just let each worker run its own ingestion loop reading from Mongo queue
+  startIngestionWorker();
 
-server.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-});
+  // Middleware
+  app.use(cors());
+  app.use(express.json());
+
+  // API Health Check
+  app.get('/api/health', (req, res) => {
+    res.status(200).json({
+      status: 'success',
+      message: `BuildNexus API is running on worker ${process.pid}`,
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  // Routes
+  app.use('/api/auth', authRoutes);
+  app.use('/api/machines', machineRoutes);
+  app.use('/api/sensors', sensorRoutes);
+  app.use('/api/energy', energyRoutes);
+  app.use('/api/ml', mlRoutes);
+  app.use('/api/ai', aiRoutes);
+  app.use('/api/work-orders', workOrderRoutes);
+  app.use('/api/parts', sparePartRoutes);
+  app.use('/api/sustainability', sustainabilityRoutes);
+  app.use('/api/quality', qualityRoutes);
+  app.use('/api/digital-twin', digitalTwinRoutes);
+  app.use('/api/simulator', simulatorRoutes);
+
+  // Error Handling Middleware
+  app.use(notFound);
+  app.use(errorHandler);
+
+  const PORT = process.env.PORT || 5000;
+
+  server.listen(PORT, () => {
+    console.log(`Worker ${process.pid} listening on port ${PORT}`);
+  });
+}
