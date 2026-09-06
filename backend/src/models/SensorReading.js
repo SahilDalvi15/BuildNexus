@@ -47,9 +47,17 @@ const SensorReadingSchema = new mongoose.Schema({
     type: Map,
     of: mongoose.Schema.Types.Mixed
   }
+}, {
+  timeseries: {
+    timeField: 'timestamp',
+    metaField: 'machineId',
+    granularity: 'seconds'
+  }
 });
 
 // Compound index for fast time-series queries per machine
+// In a native time-series collection, the timeField and metaField are automatically indexed.
+// However, we can add secondary indexes if needed.
 SensorReadingSchema.index({ machineId: 1, timestamp: -1 });
 
 const SensorReading = mongoose.model('SensorReading', SensorReadingSchema);
