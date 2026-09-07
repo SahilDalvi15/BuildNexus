@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   getOverallEnergyMetrics,
+  getEnergyOpportunities,
   getMachineEnergyMetrics
 } from '../controllers/energyController.js';
 
@@ -10,6 +11,9 @@ const router = express.Router();
 
 router.route('/overall')
   .get(protect, getOverallEnergyMetrics);
+
+router.route('/opportunities')
+  .get(protect, getEnergyOpportunities);
 
 router.route('/:machineId')
   .get(protect, getMachineEnergyMetrics);

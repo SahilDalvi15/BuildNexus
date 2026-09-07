@@ -105,3 +105,25 @@ export const getMachineEnergyMetrics = async (req, res, next) => {
     next(error);
   }
 };
+
+import EnergyOpportunity from '../models/EnergyOpportunity.js';
+
+// @desc    Get top actionable energy opportunities
+// @route   GET /api/energy/opportunities
+// @access  Private (Admin/Manager)
+export const getEnergyOpportunities = async (req, res, next) => {
+  try {
+    const opportunities = await EnergyOpportunity.find({ status: { $in: ['OPEN', 'REVIEWED'] } })
+      .populate('machineId', 'name type currentStatus')
+      .sort({ estimatedCostSavings: -1 })
+      .limit(10); // Top 10 highest value opportunities
+
+    res.json({
+      status: 'success',
+      count: opportunities.length,
+      data: opportunities
+    });
+  } catch (error) {
+    next(error);
+  }
+};
