@@ -23,10 +23,16 @@ import sustainabilityRoutes from './routes/sustainabilityRoutes.js';
 import qualityRoutes from './routes/qualityRoutes.js';
 import digitalTwinRoutes from './routes/digitalTwinRoutes.js';
 import simulatorRoutes from './routes/simulatorRoutes.js';
+import wasteRoutes from './routes/wasteRoutes.js';
+import materialRoutes from './routes/materialRoutes.js';
+import waterRoutes from './routes/waterRoutes.js';
 import { initSocket } from './services/socketService.js';
 import { startIngestionWorker } from './services/ingestionWorker.js';
 import { seedMockOpportunities } from './services/energyEngine.js';
 import { seedDefaultEmissionFactors } from './services/carbonEngine.js';
+import { seedMockWasteStreams } from './services/wasteEngine.js';
+import { seedMockMaterialBatches } from './controllers/materialController.js';
+import { seedMockWaterReadings } from './controllers/waterController.js';
 import http from 'http';
 
 dotenv.config();
@@ -53,6 +59,9 @@ if (cluster.isPrimary) {
     if (process.env.NODE_ENV !== 'production') {
       seedMockOpportunities();
       seedDefaultEmissionFactors();
+      seedMockWasteStreams();
+      seedMockMaterialBatches();
+      seedMockWaterReadings();
     }
   });
 
@@ -113,6 +122,9 @@ if (cluster.isPrimary) {
   app.use('/api/quality', qualityRoutes);
   app.use('/api/digital-twin', digitalTwinRoutes);
   app.use('/api/simulator', simulatorRoutes);
+  app.use('/api/waste', wasteRoutes);
+  app.use('/api/materials', materialRoutes);
+  app.use('/api/water', waterRoutes);
 
   // Error Handling Middleware
   app.use(notFound);
