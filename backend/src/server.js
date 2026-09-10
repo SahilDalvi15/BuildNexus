@@ -16,6 +16,7 @@ import energyRoutes from './routes/energyRoutes.js';
 import mlRoutes from './routes/mlRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 import impactRoutes from './routes/impactRoutes.js';
+import carbonRoutes from './routes/carbonRoutes.js';
 import workOrderRoutes from './routes/workOrderRoutes.js';
 import sparePartRoutes from './routes/sparePartRoutes.js';
 import sustainabilityRoutes from './routes/sustainabilityRoutes.js';
@@ -24,6 +25,8 @@ import digitalTwinRoutes from './routes/digitalTwinRoutes.js';
 import simulatorRoutes from './routes/simulatorRoutes.js';
 import { initSocket } from './services/socketService.js';
 import { startIngestionWorker } from './services/ingestionWorker.js';
+import { seedMockOpportunities } from './services/energyEngine.js';
+import { seedDefaultEmissionFactors } from './services/carbonEngine.js';
 import http from 'http';
 
 dotenv.config();
@@ -46,7 +49,12 @@ if (cluster.isPrimary) {
   });
 } else {
   // Worker Process - Connect to database
-  connectDB();
+  connectDB().then(() => {
+    if (process.env.NODE_ENV !== 'production') {
+      seedMockOpportunities();
+      seedDefaultEmissionFactors();
+    }
+  });
 
   const app = express();
   const server = http.createServer(app);
@@ -98,6 +106,7 @@ if (cluster.isPrimary) {
   app.use('/api/ml', mlRoutes);
   app.use('/api/ai', aiRoutes);
   app.use('/api/impacts', impactRoutes);
+  app.use('/api/carbon', carbonRoutes);
   app.use('/api/work-orders', workOrderRoutes);
   app.use('/api/parts', sparePartRoutes);
   app.use('/api/sustainability', sustainabilityRoutes);
