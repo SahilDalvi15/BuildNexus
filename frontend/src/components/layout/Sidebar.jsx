@@ -26,6 +26,7 @@ const Sidebar = () => {
     { name: 'AI Ops Copilot', path: '/ai-assistant', icon: <BrainCircuit size={20} /> },
     { name: 'Sustainability', path: '/sustainability', icon: <Leaf size={20} /> },
     { name: 'Carbon Intelligence', path: '/carbon', icon: <Leaf size={20} /> },
+    { name: 'Resource Intelligence', path: '/resources', icon: <Package size={20} /> },
     { name: 'Data & Integrations', path: '/data', icon: <Database size={20} /> },
     { name: 'ML Operations', path: '/mlops', icon: <Cpu size={20} /> },
     { name: 'Reports', path: '/reports', icon: <FileText size={20} /> },

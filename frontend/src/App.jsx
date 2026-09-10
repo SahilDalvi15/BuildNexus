@@ -39,6 +39,7 @@ import PlatformHealth from './pages/PlatformHealth';
 import Reports from './pages/Reports';
 import ImpactCenter from './pages/ImpactCenter';
 import CarbonIntelligence from './pages/CarbonIntelligence';
+import ResourceIntelligence from './pages/ResourceIntelligence';
 
 function App() {
   return (
@@ -69,6 +70,7 @@ function App() {
               <Route path="simulator" element={<Simulator />} />
               <Route path="sustainability" element={<Sustainability />} />
               <Route path="carbon" element={<CarbonIntelligence />} />
+              <Route path="resources" element={<ResourceIntelligence />} />
               <Route path="data" element={<DataIntegrations />} />
               <Route path="mlops" element={<MLOps />} />
               <Route path="reports" element={<Reports />} />
