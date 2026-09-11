@@ -27,6 +27,7 @@ import wasteRoutes from './routes/wasteRoutes.js';
 import materialRoutes from './routes/materialRoutes.js';
 import waterRoutes from './routes/waterRoutes.js';
 import optimizerRoutes from './routes/optimizerRoutes.js';
+import benchmarkRoutes from './routes/benchmarkRoutes.js';
 import { initSocket } from './services/socketService.js';
 import { startIngestionWorker } from './services/ingestionWorker.js';
 import { seedMockOpportunities } from './services/energyEngine.js';
@@ -127,6 +128,7 @@ if (cluster.isPrimary) {
   app.use('/api/materials', materialRoutes);
   app.use('/api/water', waterRoutes);
   app.use('/api/optimizer', optimizerRoutes);
+  app.use('/api/benchmarking', benchmarkRoutes);
 
   // Error Handling Middleware
   app.use(notFound);
