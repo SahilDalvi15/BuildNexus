@@ -29,6 +29,7 @@ import waterRoutes from './routes/waterRoutes.js';
 import optimizerRoutes from './routes/optimizerRoutes.js';
 import benchmarkRoutes from './routes/benchmarkRoutes.js';
 import supplierRoutes from './routes/supplierRoutes.js';
+import recommendationRoutes from './routes/recommendationRoutes.js';
 import { initSocket } from './services/socketService.js';
 import { startIngestionWorker } from './services/ingestionWorker.js';
 import { seedMockOpportunities } from './services/energyEngine.js';
@@ -133,6 +134,7 @@ if (cluster.isPrimary) {
   app.use('/api/optimizer', optimizerRoutes);
   app.use('/api/benchmarking', benchmarkRoutes);
   app.use('/api/suppliers', supplierRoutes);
+  app.use('/api/recommendations', recommendationRoutes);
 
   // Error Handling Middleware
   app.use(notFound);
