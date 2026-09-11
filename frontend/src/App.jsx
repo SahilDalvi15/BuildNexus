@@ -41,6 +41,7 @@ import ImpactCenter from './pages/ImpactCenter';
 import CarbonIntelligence from './pages/CarbonIntelligence';
 import ResourceIntelligence from './pages/ResourceIntelligence';
 import Optimizer from './pages/Optimizer';
+import Asset360 from './pages/Asset360';
 
 function App() {
   return (
@@ -62,6 +63,7 @@ function App() {
               
               {/* V3 Routes */}
               <Route path="assets" element={<Assets />} />
+              <Route path="assets/:id" element={<Asset360 />} />
               <Route path="lines" element={<Lines />} />
               <Route path="work-orders" element={<WorkOrders />} />
               <Route path="parts" element={<SpareParts />} />

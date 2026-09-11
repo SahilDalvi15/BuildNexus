@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PlantContext } from '../context/PlantContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -6,6 +7,7 @@ import { Settings, AlertTriangle, CheckCircle, Activity, Info } from 'lucide-rea
 
 const Assets = () => {
     const { activePlant } = useContext(PlantContext);
+    const navigate = useNavigate();
     const [machines, setMachines] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -67,7 +69,7 @@ const Assets = () => {
                     ) : (
                         machines.map(machine => (
                             <div className="col-12 col-md-6 col-lg-4" key={machine._id}>
-                                <div className="stat-card h-100 position-relative hover-lift">
+                                <div className="stat-card h-100 position-relative hover-lift" style={{cursor: 'pointer'}} onClick={() => navigate(`/assets/${machine._id}`)}>
                                     <div className="d-flex justify-content-between mb-3">
                                         <div className="d-flex align-items-center gap-2">
                                             <div className="avatar-sm" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', borderRadius: '8px', padding: '10px' }}>
