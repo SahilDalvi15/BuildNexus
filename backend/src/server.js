@@ -28,6 +28,7 @@ import materialRoutes from './routes/materialRoutes.js';
 import waterRoutes from './routes/waterRoutes.js';
 import optimizerRoutes from './routes/optimizerRoutes.js';
 import benchmarkRoutes from './routes/benchmarkRoutes.js';
+import supplierRoutes from './routes/supplierRoutes.js';
 import { initSocket } from './services/socketService.js';
 import { startIngestionWorker } from './services/ingestionWorker.js';
 import { seedMockOpportunities } from './services/energyEngine.js';
@@ -35,6 +36,7 @@ import { seedDefaultEmissionFactors } from './services/carbonEngine.js';
 import { seedMockWasteStreams } from './services/wasteEngine.js';
 import { seedMockMaterialBatches } from './controllers/materialController.js';
 import { seedMockWaterReadings } from './controllers/waterController.js';
+import { seedMockSuppliers } from './controllers/supplierController.js';
 import http from 'http';
 
 dotenv.config();
@@ -64,6 +66,7 @@ if (cluster.isPrimary) {
       seedMockWasteStreams();
       seedMockMaterialBatches();
       seedMockWaterReadings();
+      seedMockSuppliers();
     }
   });
 
@@ -129,6 +132,7 @@ if (cluster.isPrimary) {
   app.use('/api/water', waterRoutes);
   app.use('/api/optimizer', optimizerRoutes);
   app.use('/api/benchmarking', benchmarkRoutes);
+  app.use('/api/suppliers', supplierRoutes);
 
   // Error Handling Middleware
   app.use(notFound);
