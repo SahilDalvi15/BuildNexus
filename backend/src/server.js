@@ -30,6 +30,7 @@ import optimizerRoutes from './routes/optimizerRoutes.js';
 import benchmarkRoutes from './routes/benchmarkRoutes.js';
 import supplierRoutes from './routes/supplierRoutes.js';
 import recommendationRoutes from './routes/recommendationRoutes.js';
+import alertRoutes from './routes/alertRoutes.js';
 import { initSocket } from './services/socketService.js';
 import { startIngestionWorker } from './services/ingestionWorker.js';
 import { seedMockOpportunities } from './services/energyEngine.js';
@@ -38,6 +39,7 @@ import { seedMockWasteStreams } from './services/wasteEngine.js';
 import { seedMockMaterialBatches } from './controllers/materialController.js';
 import { seedMockWaterReadings } from './controllers/waterController.js';
 import { seedMockSuppliers } from './controllers/supplierController.js';
+import { generateMockAlerts } from './services/alertEngine.js';
 import http from 'http';
 
 dotenv.config();
@@ -68,6 +70,7 @@ if (cluster.isPrimary) {
       seedMockMaterialBatches();
       seedMockWaterReadings();
       seedMockSuppliers();
+      generateMockAlerts();
     }
   });
 
@@ -135,6 +138,7 @@ if (cluster.isPrimary) {
   app.use('/api/benchmarking', benchmarkRoutes);
   app.use('/api/suppliers', supplierRoutes);
   app.use('/api/recommendations', recommendationRoutes);
+  app.use('/api/alerts', alertRoutes);
 
   // Error Handling Middleware
   app.use(notFound);

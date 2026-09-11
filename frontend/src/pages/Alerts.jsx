@@ -11,54 +11,38 @@ const Alerts = () => {
 
     useEffect(() => {
         if (activePlant) {
-            fetchMockAlerts();
+            fetchAlerts();
         }
     }, [activePlant]);
 
-    const fetchMockAlerts = () => {
+    const fetchAlerts = async () => {
         setLoading(true);
-        setTimeout(() => {
-            setAlerts([
-                {
-                    _id: 'a1',
-                    severity: 'CRITICAL',
-                    type: 'PREDICTIVE_MAINTENANCE',
-                    machineId: 'M-204',
-                    message: 'Failure predicted in next 48 hours (Probability: 82%).',
-                    timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-                    status: 'NEW'
-                },
-                {
-                    _id: 'a2',
-                    severity: 'WARNING',
-                    type: 'ENERGY_ANOMALY',
-                    machineId: 'L-02',
-                    message: 'Line 02 consuming 15% more power than baseline during idle state.',
-                    timestamp: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
-                    status: 'ACKNOWLEDGED'
-                },
-                {
-                    _id: 'a3',
-                    severity: 'CRITICAL',
-                    type: 'QUALITY_RISK',
-                    machineId: 'M-105',
-                    message: 'High defect probability detected based on temperature variance.',
-                    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-                    status: 'RESOLVED'
-                }
-            ]);
+        try {
+            const token = localStorage.getItem('token');
+            const res = await axios.get(`http://localhost:5000/api/alerts`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setAlerts(res.data.data);
+        } catch (error) {
+            console.error('Error fetching alerts:', error);
+            toast.error('Failed to load alerts');
+        } finally {
             setLoading(false);
-        }, 500);
+        }
     };
 
-    const handleAcknowledge = (id) => {
-        setAlerts(alerts.map(a => a._id === id ? { ...a, status: 'ACKNOWLEDGED' } : a));
-        toast.info('Alert acknowledged');
-    };
-
-    const handleResolve = (id) => {
-        setAlerts(alerts.map(a => a._id === id ? { ...a, status: 'RESOLVED' } : a));
-        toast.success('Alert resolved');
+    const handleUpdateStatus = async (id, status) => {
+        try {
+            const token = localStorage.getItem('token');
+            await axios.put(`http://localhost:5000/api/alerts/${id}/status`, { status }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setAlerts(alerts.map(a => a._id === id ? { ...a, status } : a));
+            if (status === 'ACKNOWLEDGED') toast.info('Alert acknowledged');
+            if (status === 'RESOLVED') toast.success('Alert resolved');
+        } catch (error) {
+            toast.error('Failed to update alert status');
+        }
     };
 
     const getSeverityBadge = (severity) => {
@@ -114,32 +98,44 @@ const Alerts = () => {
                         </div>
                     ) : (
                         filteredAlerts.map(alert => (
-                            <div key={alert._id} className="card p-3 d-flex flex-row align-items-center justify-content-between hover-lift border-start border-4" style={{ borderLeftColor: alert.severity === 'CRITICAL' ? 'var(--danger)' : 'var(--warning)' }}>
-                                <div className="d-flex align-items-start gap-3">
+                            <div key={alert._id} className="card p-3 d-flex flex-row align-items-center justify-content-between hover-lift border-start border-4" style={{ borderLeftColor: alert.severityLevel >= 8 ? 'var(--danger)' : 'var(--warning)' }}>
+                                <div className="d-flex align-items-start gap-3 w-100 me-3">
                                     <div className="mt-1">
-                                        {alert.severity === 'CRITICAL' ? <AlertTriangle size={24} className="text-danger" /> : <AlertTriangle size={24} className="text-warning" />}
-                                    </div>
-                                    <div>
-                                        <div className="d-flex align-items-center gap-2 mb-1">
-                                            {getSeverityBadge(alert.severity)}
-                                            <span className="text-white fw-bold">{alert.machineId}</span>
-                                            <span className="text-secondary small ms-2">{new Date(alert.timestamp).toLocaleString()}</span>
+                                        <div className={`p-2 rounded ${alert.severityLevel >= 8 ? 'bg-danger text-white' : 'bg-warning text-dark'}`}>
+                                            <span className="fw-bold">{alert.priorityScore}</span>
                                         </div>
-                                        <p className="text-white m-0">{alert.message}</p>
+                                    </div>
+                                    <div className="flex-grow-1">
+                                        <div className="d-flex align-items-center gap-2 mb-1">
+                                            {getSeverityBadge(alert.severityLevel >= 8 ? 'CRITICAL' : 'WARNING')}
+                                            <span className="text-white fw-bold">{alert.machineId?.name || alert.machineId}</span>
+                                            <span className="text-secondary small ms-2">{new Date(alert.createdAt).toLocaleString()}</span>
+                                            <span className="badge bg-dark border ms-auto">{alert.type}</span>
+                                        </div>
+                                        <h6 className="text-white mb-1">{alert.title}</h6>
+                                        <p className="text-muted m-0 small">{alert.message}</p>
+                                        
+                                        {alert.priorityExplanation && alert.priorityExplanation.length > 0 && (
+                                            <div className="mt-2 d-flex gap-2 flex-wrap">
+                                                {alert.priorityExplanation.map((exp, i) => (
+                                                    <span key={i} className="badge bg-secondary opacity-75">{exp}</span>
+                                                ))}
+                                            </div>
+                                        )}
+
                                         <div className="d-flex align-items-center gap-2 mt-2">
                                             <span className="text-secondary small d-flex align-items-center gap-1">
                                                 {getStatusIcon(alert.status)} {alert.status}
                                             </span>
-                                            <span className="text-secondary small px-2 border-start border-secondary">{alert.type}</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="d-flex flex-column gap-2">
+                                <div className="d-flex flex-column gap-2 flex-shrink-0">
                                     {alert.status === 'NEW' && (
-                                        <button className="btn btn-sm btn-outline-warning" onClick={() => handleAcknowledge(alert._id)}>Acknowledge</button>
+                                        <button className="btn btn-sm btn-outline-warning" onClick={() => handleUpdateStatus(alert._id, 'ACKNOWLEDGED')}>Acknowledge</button>
                                     )}
                                     {alert.status !== 'RESOLVED' && (
-                                        <button className="btn btn-sm btn-outline-success" onClick={() => handleResolve(alert._id)}>Resolve</button>
+                                        <button className="btn btn-sm btn-outline-success" onClick={() => handleUpdateStatus(alert._id, 'RESOLVED')}>Resolve</button>
                                     )}
                                 </div>
                             </div>
