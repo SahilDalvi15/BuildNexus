@@ -40,6 +40,7 @@ import Reports from './pages/Reports';
 import ImpactCenter from './pages/ImpactCenter';
 import CarbonIntelligence from './pages/CarbonIntelligence';
 import ResourceIntelligence from './pages/ResourceIntelligence';
+import Optimizer from './pages/Optimizer';
 
 function App() {
   return (
@@ -71,6 +72,7 @@ function App() {
               <Route path="sustainability" element={<Sustainability />} />
               <Route path="carbon" element={<CarbonIntelligence />} />
               <Route path="resources" element={<ResourceIntelligence />} />
+              <Route path="optimizer" element={<Optimizer />} />
               <Route path="data" element={<DataIntegrations />} />
               <Route path="mlops" element={<MLOps />} />
               <Route path="reports" element={<Reports />} />
