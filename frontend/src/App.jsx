@@ -45,6 +45,7 @@ import Asset360 from './pages/Asset360';
 import CulletOptimizer from './pages/CulletOptimizer';
 import FurnaceTwin from './pages/FurnaceTwin';
 import DefectImpactTracker from './pages/DefectImpactTracker';
+import VerifiedImpact from './pages/VerifiedImpact';
 
 function App() {
   return (
@@ -80,6 +81,7 @@ function App() {
               <Route path="cullet-optimizer" element={<CulletOptimizer />} />
               <Route path="furnace-twin" element={<FurnaceTwin />} />
               <Route path="defect-impact" element={<DefectImpactTracker />} />
+              <Route path="verified-impact" element={<VerifiedImpact />} />
               <Route path="optimizer" element={<Optimizer />} />
               <Route path="data" element={<DataIntegrations />} />
               <Route path="mlops" element={<MLOps />} />
