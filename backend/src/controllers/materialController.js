@@ -80,6 +80,85 @@ export const getMaterialOptimization = async (req, res, next) => {
   }
 };
 
+// @desc    Simulate Cullet (Recycled Glass) Mix Optimization (Saint-Gobain specific use case)
+// @route   POST /api/materials/cullet-optimizer
+// @access  Private
+export const simulateCulletMix = async (req, res, next) => {
+  try {
+    const { currentCulletPercent = 20, targetCulletPercent = 30, dailyProductionTons = 1000 } = req.body;
+
+    // Constants based on typical glass manufacturing (approximations for simulation)
+    const ENERGY_KWH_PER_TON_VIRGIN = 1500; // kWh to melt 1 ton of virgin material
+    const ENERGY_KWH_PER_TON_CULLET = 1200; // kWh to melt 1 ton of cullet (saves ~20%)
+    const COST_PER_KWH = 0.12;
+    const CARBON_KG_PER_KWH = 0.38;
+    const VIRGIN_COST_PER_TON = 80;
+    const CULLET_COST_PER_TON = 55;
+
+    // Current State Calculations
+    const currentVirginTons = dailyProductionTons * (1 - (currentCulletPercent / 100));
+    const currentCulletTons = dailyProductionTons * (currentCulletPercent / 100);
+    const currentEnergyKwh = (currentVirginTons * ENERGY_KWH_PER_TON_VIRGIN) + (currentCulletTons * ENERGY_KWH_PER_TON_CULLET);
+    
+    // Target State Calculations
+    const targetVirginTons = dailyProductionTons * (1 - (targetCulletPercent / 100));
+    const targetCulletTons = dailyProductionTons * (targetCulletPercent / 100);
+    const targetEnergyKwh = (targetVirginTons * ENERGY_KWH_PER_TON_VIRGIN) + (targetCulletTons * ENERGY_KWH_PER_TON_CULLET);
+
+    // Impact Calculations
+    const energySavedKwh = currentEnergyKwh - targetEnergyKwh;
+    const energyCostSavings = energySavedKwh * COST_PER_KWH;
+    
+    const currentMaterialCost = (currentVirginTons * VIRGIN_COST_PER_TON) + (currentCulletTons * CULLET_COST_PER_TON);
+    const targetMaterialCost = (targetVirginTons * VIRGIN_COST_PER_TON) + (targetCulletTons * CULLET_COST_PER_TON);
+    const materialCostSavings = currentMaterialCost - targetMaterialCost;
+
+    const carbonSavedKg = energySavedKwh * CARBON_KG_PER_KWH;
+    
+    // Quality Risk Calculation (Non-linear risk increase as cullet % goes very high)
+    // Up to 40% is usually fine. Above 40%, risk increases rapidly due to impurities.
+    let qualityRiskScore = 0;
+    if (targetCulletPercent <= 25) qualityRiskScore = 5; // Low risk
+    else if (targetCulletPercent <= 40) qualityRiskScore = 15; // Moderate risk
+    else if (targetCulletPercent <= 60) qualityRiskScore = 40; // High risk
+    else qualityRiskScore = 80; // Critical risk
+
+    const defectProbabilityPercent = (qualityRiskScore / 100) * 12; // Max 12% defect probability
+
+    res.json({
+      status: 'success',
+      data: {
+        simulationId: `CULLET-${Date.now()}`,
+        inputs: {
+          currentCulletPercent,
+          targetCulletPercent,
+          dailyProductionTons
+        },
+        impact: {
+          energySavedKwhDaily: parseFloat(energySavedKwh.toFixed(1)),
+          energyCostSavingsDailyUSD: parseFloat(energyCostSavings.toFixed(2)),
+          materialCostSavingsDailyUSD: parseFloat(materialCostSavings.toFixed(2)),
+          totalSavingsDailyUSD: parseFloat((energyCostSavings + materialCostSavings).toFixed(2)),
+          carbonSavedKgCO2eDaily: parseFloat(carbonSavedKg.toFixed(1)),
+          qualityRisk: {
+            score: qualityRiskScore,
+            level: qualityRiskScore < 20 ? 'LOW' : qualityRiskScore < 50 ? 'MEDIUM' : 'HIGH',
+            defectProbabilityPercent: parseFloat(defectProbabilityPercent.toFixed(2)),
+            warning: targetCulletPercent > 40 ? 'High cullet ratio requires advanced optical sorting to prevent inclusions.' : 'Within standard operational bounds.'
+          }
+        },
+        annualized: {
+          savingsUSD: parseFloat(((energyCostSavings + materialCostSavings) * 350).toFixed(0)), // Assuming 350 working days
+          carbonReducedTons: parseFloat(((carbonSavedKg * 350) / 1000).toFixed(1))
+        }
+      }
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
 /**
  * Seed mock material batches for demonstration.
  */

@@ -42,6 +42,7 @@ import CarbonIntelligence from './pages/CarbonIntelligence';
 import ResourceIntelligence from './pages/ResourceIntelligence';
 import Optimizer from './pages/Optimizer';
 import Asset360 from './pages/Asset360';
+import CulletOptimizer from './pages/CulletOptimizer';
 
 function App() {
   return (
@@ -74,6 +75,7 @@ function App() {
               <Route path="sustainability" element={<Sustainability />} />
               <Route path="carbon" element={<CarbonIntelligence />} />
               <Route path="resources" element={<ResourceIntelligence />} />
+              <Route path="cullet-optimizer" element={<CulletOptimizer />} />
               <Route path="optimizer" element={<Optimizer />} />
               <Route path="data" element={<DataIntegrations />} />
               <Route path="mlops" element={<MLOps />} />
