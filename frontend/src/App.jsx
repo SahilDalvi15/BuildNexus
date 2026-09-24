@@ -43,6 +43,8 @@ import ResourceIntelligence from './pages/ResourceIntelligence';
 import Optimizer from './pages/Optimizer';
 import Asset360 from './pages/Asset360';
 import CulletOptimizer from './pages/CulletOptimizer';
+import FurnaceTwin from './pages/FurnaceTwin';
+import DefectImpactTracker from './pages/DefectImpactTracker';
 
 function App() {
   return (
@@ -76,6 +78,8 @@ function App() {
               <Route path="carbon" element={<CarbonIntelligence />} />
               <Route path="resources" element={<ResourceIntelligence />} />
               <Route path="cullet-optimizer" element={<CulletOptimizer />} />
+              <Route path="furnace-twin" element={<FurnaceTwin />} />
+              <Route path="defect-impact" element={<DefectImpactTracker />} />
               <Route path="optimizer" element={<Optimizer />} />
               <Route path="data" element={<DataIntegrations />} />
               <Route path="mlops" element={<MLOps />} />

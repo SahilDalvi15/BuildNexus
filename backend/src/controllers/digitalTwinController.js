@@ -65,3 +65,65 @@ export const getDigitalTwinLayout = async (req, res, next) => {
         next(error);
     }
 };
+
+// @desc    Simulate Furnace Fuel Switching (Natural Gas vs Hydrogen/Electric)
+// @route   POST /api/digital-twin/furnace-simulator
+// @access  Private
+export const simulateFurnaceFuel = async (req, res, next) => {
+    try {
+        const { currentGasPercent = 100, targetGasPercent = 70, targetHydrogenPercent = 30, dailyEnergyMwh = 500 } = req.body;
+
+        // Base assumptions for high-temp glass furnace
+        const COST_NATURAL_GAS_PER_MWH = 35; // USD
+        const COST_HYDROGEN_PER_MWH = 120; // USD (Green hydrogen is currently expensive)
+        const EMISSIONS_NATURAL_GAS_KG_PER_MWH = 202; // kg CO2 per MWh
+        const EMISSIONS_HYDROGEN_KG_PER_MWH = 0; // Green hydrogen at point of combustion
+
+        // Current state
+        const currentGasMwh = dailyEnergyMwh * (currentGasPercent / 100);
+        const currentCost = currentGasMwh * COST_NATURAL_GAS_PER_MWH;
+        const currentEmissions = currentGasMwh * EMISSIONS_NATURAL_GAS_KG_PER_MWH;
+
+        // Target state
+        const targetGasMwh = dailyEnergyMwh * (targetGasPercent / 100);
+        const targetHydrogenMwh = dailyEnergyMwh * (targetHydrogenPercent / 100);
+        
+        const targetCost = (targetGasMwh * COST_NATURAL_GAS_PER_MWH) + (targetHydrogenMwh * COST_HYDROGEN_PER_MWH);
+        const targetEmissions = (targetGasMwh * EMISSIONS_NATURAL_GAS_KG_PER_MWH) + (targetHydrogenMwh * EMISSIONS_HYDROGEN_KG_PER_MWH);
+
+        // Impact
+        const costIncreaseDaily = targetCost - currentCost;
+        const emissionsReducedDaily = currentEmissions - targetEmissions;
+
+        res.json({
+            status: 'success',
+            data: {
+                simulationId: `FURNACE-${Date.now()}`,
+                inputs: {
+                    currentGasPercent,
+                    targetGasPercent,
+                    targetHydrogenPercent,
+                    dailyEnergyMwh
+                },
+                impact: {
+                    currentDailyCostUSD: parseFloat(currentCost.toFixed(2)),
+                    targetDailyCostUSD: parseFloat(targetCost.toFixed(2)),
+                    costIncreaseDailyUSD: parseFloat(costIncreaseDaily.toFixed(2)),
+                    
+                    currentDailyEmissionsKg: parseFloat(currentEmissions.toFixed(2)),
+                    targetDailyEmissionsKg: parseFloat(targetEmissions.toFixed(2)),
+                    emissionsReducedDailyKg: parseFloat(emissionsReducedDaily.toFixed(2)),
+                    
+                    carbonReductionPercent: parseFloat(((emissionsReducedDaily / currentEmissions) * 100).toFixed(1)),
+                    costPremiumPercent: parseFloat(((costIncreaseDaily / currentCost) * 100).toFixed(1))
+                },
+                annualized: {
+                    carbonReducedTons: parseFloat(((emissionsReducedDaily * 350) / 1000).toFixed(1)),
+                    costPremiumUSD: parseFloat((costIncreaseDaily * 350).toFixed(0))
+                }
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
+};

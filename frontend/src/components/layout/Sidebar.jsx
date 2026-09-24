@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Activity, Zap, ShieldAlert, Target, Box, 
   GitBranch, Wrench, Package, Bell, Map, Calculator, 
   BrainCircuit, Leaf, Database, Cpu, FileText, History, 
-  Users, ActivitySquare, Settings, TrendingUp
+  Users, ActivitySquare, Settings, TrendingUp, Flame, AlertOctagon
 } from 'lucide-react';
 import './layout.css';
 
@@ -28,6 +28,8 @@ const Sidebar = () => {
     { name: 'Carbon Intelligence', path: '/carbon', icon: <Leaf size={20} /> },
     { name: 'Resource Intelligence', path: '/resources', icon: <Package size={20} /> },
     { name: 'SG Cullet Optimizer', path: '/cullet-optimizer', icon: <Target size={20} /> },
+    { name: 'SG Furnace Twin', path: '/furnace-twin', icon: <Flame size={20} /> },
+    { name: 'SG Defect Tracker', path: '/defect-impact', icon: <AlertOctagon size={20} /> },
     { name: 'Optimizer', path: '/optimizer', icon: <Target size={20} /> },
     { name: 'Data & Integrations', path: '/data', icon: <Database size={20} /> },
     { name: 'ML Operations', path: '/mlops', icon: <Cpu size={20} /> },
