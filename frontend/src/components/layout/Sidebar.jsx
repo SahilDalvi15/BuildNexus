@@ -25,6 +25,7 @@ const Sidebar = () => {
     { name: 'Digital Twin', path: '/digital-twin', icon: <Map size={20} /> },
     { name: 'What-If Simulator', path: '/simulator', icon: <Calculator size={20} /> },
     { name: 'AI Ops Copilot', path: '/ai-assistant', icon: <BrainCircuit size={20} /> },
+    { name: 'Decarbonization', path: '/decarbonization', icon: <Target size={20} /> },
     { name: 'Sustainability', path: '/sustainability', icon: <Leaf size={20} /> },
     { name: 'Carbon Intelligence', path: '/carbon', icon: <Leaf size={20} /> },
     { name: 'Resource Intelligence', path: '/resources', icon: <Package size={20} /> },

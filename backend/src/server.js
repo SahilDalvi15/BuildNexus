@@ -31,6 +31,7 @@ import benchmarkRoutes from './routes/benchmarkRoutes.js';
 import supplierRoutes from './routes/supplierRoutes.js';
 import recommendationRoutes from './routes/recommendationRoutes.js';
 import alertRoutes from './routes/alertRoutes.js';
+import decarbRoutes from './routes/decarbRoutes.js';
 import { initSocket } from './services/socketService.js';
 import { startIngestionWorker } from './services/ingestionWorker.js';
 import { seedMockOpportunities } from './services/energyEngine.js';
@@ -128,6 +129,7 @@ if (cluster.isPrimary) {
   app.use('/api/work-orders', workOrderRoutes);
   app.use('/api/parts', sparePartRoutes);
   app.use('/api/sustainability', sustainabilityRoutes);
+  app.use('/api/decarbonization', decarbRoutes);
   app.use('/api/quality', qualityRoutes);
   app.use('/api/digital-twin', digitalTwinRoutes);
   app.use('/api/simulator', simulatorRoutes);
